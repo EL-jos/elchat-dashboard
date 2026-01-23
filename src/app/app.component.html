@@ -1,0 +1,31 @@
+
+<main id="el-dom-app" [ngClass]="{'el-menu-opened': isOpened}">
+  <!-- <header id="el-header-app">
+    <h1></h1>
+  </header> -->
+  <mat-drawer-container class="example-container" [hasBackdrop]="false">
+    <mat-drawer #drawer mode="side" [opened]="true">
+      <div class="el-menu-list">
+        <a class="el-menu-item" mat-button routerLink="/dashboard" routerLinkActive="is-active"> <fa-icon [icon]="faThLarge"></fa-icon> Tableau de bord </a>
+        <a *ngIf="user === null"class="el-menu-item" mat-button routerLink="/login" routerLinkActive="is-active"><fa-icon [icon]="faSignIn"></fa-icon> Se connecter</a>
+        <a *ngIf="user !== null" class="el-menu-item" mat-button><fa-icon [icon]="faSignOut"></fa-icon> Se déconnecter</a>
+      </div>
+    </mat-drawer>
+    <mat-drawer-content>
+      <div id="el-main-page">
+        <header id="el-titre-page">
+          <button class="el-center-box">
+            <mat-icon>menu</mat-icon>
+          </button>
+          <h2>Titre de la page</h2>
+        </header>
+        <!-- <div class="loader-container" *ngIf="loaderService.isLoading | async">
+          <mat-spinner></mat-spinner>
+        </div> -->
+        <main id="el-main-component">
+          <router-outlet></router-outlet>
+        </main>
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
+</main>
