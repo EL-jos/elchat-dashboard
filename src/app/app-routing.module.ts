@@ -6,6 +6,7 @@ import { SignInComponent } from './pages/sign-in/sign-in.component';
 import { SignUpComponent } from './pages/sign-up/sign-up.component';
 import { VerificationComponent } from './pages/verification/verification.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { SiteComponent } from './pages/site/site.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
@@ -15,6 +16,7 @@ const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'new-password', component: NewPasswordComponent },
   { path: 'dashboard', component: DashboardComponent },
+  { path: 'site/:id', component: SiteComponent },
   { path: '**', redirectTo: '/sign-in' }
 ];
 

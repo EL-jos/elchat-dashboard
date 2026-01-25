@@ -20,11 +20,13 @@ export class SignUpComponent {
 
   onSubmit(signUpFormGroup: NgForm): void {
     if (!signUpFormGroup.valid) return;
+    const playload = signUpFormGroup.value;
+    playload.is_admin = true;
 
     this.loading = true;
     this.error = undefined;
 
-    this.authService.register(signUpFormGroup.value).subscribe({
+    this.authService.register(playload).subscribe({
       next: (res) => {
         // ✔️ compte créé, PAS connecté
         this.router.navigate(['/verify'], {

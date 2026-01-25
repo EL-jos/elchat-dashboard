@@ -5,9 +5,11 @@ import { Conversation } from '../conversation/conversation';
 import { Document } from '../document/document';
 import { SiteService } from '../../services/site/site.service';
 import { User } from '../user/user';
+import { Account } from '../account/account';
 
 export class Site {
     public type: TypeSite | null = null;
+    public account: Account | null = null;
     public pages: Page[] = [];
     public conversations: Conversation[] = [];
     public documents: Document[] = [];
@@ -24,20 +26,21 @@ export class Site {
     public pivotMap: Record<string, { first_seen_at: string; last_seen_at: string }> = {};
 
     constructor(
-        public id: string,
-        public account_id: string,
-        public type_site_id: string,
-        public company_name: string,
-        public url: string,
-        public status: 'pending' | 'crawling' | 'ready' | 'error' | 'indexing',
-        public crawl_depth: number,
-        public crawl_delay: number,
-        public exclude_pages: string[],
-        public include_pages: string[],
-        public pending_urls_count: number,
-        public last_sitemap_crawled_at: string | null,
-        public created_at: string,
-        public public_token?: string, // widget
+        public id: string | null = null,
+        public account_id: string | null = null,
+        public type_site_id: string | null = null,
+        public name: string | null = null,
+        public url: string | null = null,
+        public status: 'pending' | 'crawling' | 'ready' | 'error' | 'indexing' = 'pending',
+        public crawl_depth: number = 0,
+        public crawl_delay: number = 0,
+        public exclude_pages: string[] = [],
+        public include_pages: string[] = [],
+        public pending_urls_count: number = 0,
+        public last_sitemap_crawled_at: string | null = null,
+        public created_at: string | null = null,
+        public favicon: string = "",
+        public public_token: string = "", // widget
     ) { }
 
     static fromJson(json: any): Site {
@@ -45,7 +48,7 @@ export class Site {
             json.id,
             json.account_id,
             json.type_site_id,
-            json.company_name,
+            json.name,
             json.url,
             json.status,
             json.crawl_depth,
@@ -55,6 +58,7 @@ export class Site {
             json.pending_urls_count ?? 0,
             json.last_sitemap_crawled_at ?? null,
             json.created_at,
+            json.favicon,
             json.public_token
         );
 
@@ -66,7 +70,19 @@ export class Site {
             });
         }
 
+        if (json.type) {
+            site.type = TypeSite.fromJson(json.type);
+        }
+
+        if(json.account){
+            site.account = Account.fromJson(json.account);
+        }
+
         return site;
+    }
+
+    exists() {
+        return this.created_at !== null;
     }
 
     getPivot(userId: string) {
@@ -75,16 +91,16 @@ export class Site {
 
     async loadPages(service: SiteService): Promise<void> {
         if (this.pages.length > 0) return;
-        this.pages = await firstValueFrom(service.getPages(this.id));
+        this.pages = await firstValueFrom(service.getPages(this.id!));
     }
 
     async loadConversations(service: SiteService): Promise<void> {
         if (this.conversations.length > 0) return;
-        this.conversations = await firstValueFrom(service.getConversations(this.id));
+        this.conversations = await firstValueFrom(service.getConversations(this.id!));
     }
 
     async loadDocuments(service: SiteService): Promise<void> {
         if (this.documents.length > 0) return;
-        this.documents = await firstValueFrom(service.getDocuments(this.id));
+        this.documents = await firstValueFrom(service.getDocuments(this.id!));
     }
 }

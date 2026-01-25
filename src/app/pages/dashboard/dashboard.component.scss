@@ -44,7 +44,7 @@
     color: #707070;
 }
 
-.mat-mdc-card-content .ng-fa-icon {
+.el-container-stats .mat-mdc-card-content .ng-fa-icon {
     font-size: 3rem;
     color: #ed6f01;
 }
@@ -90,4 +90,17 @@
 
 .p-tag-value{
     padding: .25rem !important;
+}
+
+.el-controls-btns{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+}
+
+.el-controls-btns .mat-mdc-card-content .ng-fa-icon {
+    font-size: 1.5rem;
+    color: #efff;
 }

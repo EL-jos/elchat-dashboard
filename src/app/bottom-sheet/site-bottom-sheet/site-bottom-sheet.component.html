@@ -1,0 +1,58 @@
+<form  #siteFormGroup="ngForm" (ngSubmit)="onSubmit(siteFormGroup)">
+    <mat-stepper #stepper>
+        <mat-step label="Informations du site web">
+            <div class="el-row">
+                <div class="el-col">
+                    <mat-form-field>
+                        <mat-label>Nom du site web</mat-label>
+                        <input matInput name="name" [(ngModel)]="site.name" required>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="el-row">
+                <div class="el-col">
+                    <mat-form-field>
+                        <mat-label>Type de site web</mat-label>
+                        <mat-select name="type_site_id" [(ngModel)]="site.type_site_id" required>
+                            <mat-option *ngFor="let typeSite of typeSites; let i=index" [value]="typeSite.id">{{ (i+1) + '. '+ typeSite.name | lowercase }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="el-col">
+                    <mat-form-field>
+                        <mat-label>URL du site web</mat-label>
+                        <input matInput name="url" [(ngModel)]="site.url" required>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="el-controls-btns">
+                <button mat-raised-button matStepperNext type="button" color="primary">Suivant</button>
+            </div>
+        </mat-step>
+        <mat-step label="Pages du site">
+            <div class="el-row">
+                <div class="el-col">
+                    <mat-form-field>
+                        <mat-label>include_pages</mat-label>
+                        <textarea matInput name="include_pages" [(ngModel)]="site.include_pages" placeholder="Ex: https://monsite.com/blog. Les séparateurs acceptés : nouvelle ligne ou , ou ; ou |"></textarea>
+                    </mat-form-field>
+                </div>
+                <div class="el-col">
+                    <mat-form-field>
+                        <mat-label>exclude_pages</mat-label>
+                        <textarea matInput name="exclude_pages" [(ngModel)]="site.exclude_pages" placeholder="Ex: https://monsite.com/blog. Les séparateurs acceptés : nouvelle ligne ou , ou ; ou |"></textarea>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="el-row">
+                <p-fileUpload mode="basic" chooseLabel="Choisir un fichier .xml" [auto]="false" [customUpload]="true" chooseIcon="pi pi-upload"
+                    (onSelect)="onFileSelect($event)" accept=".xml" [maxFileSize]="10000000">
+                </p-fileUpload>
+            </div>
+            <div class="el-controls-btns">
+                <button mat-raised-button matStepperPrevious type="button">Back</button>
+                <button mat-raised-button type="submit" color="primary">Enregistrer</button>
+            </div>
+        </mat-step>
+    </mat-stepper>
+</form>

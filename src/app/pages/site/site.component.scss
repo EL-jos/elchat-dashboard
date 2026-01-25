@@ -1,0 +1,211 @@
+.mat-mdc-card-title {
+    padding: 1rem;
+}
+
+#el-container-infos-website {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: .5rem;
+    min-width: 300px;
+}
+
+#el-container-infos-website .el-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 70px;
+    overflow: hidden;
+}
+
+#el-container-infos-website .el-logo img{
+    border-radius: 50%;
+}
+
+#el-container-infos-website .el-container-logo {
+    position: relative;
+    box-shadow: 0 0 5px rgba(0, 0, 0, .15);
+    border-radius: 50%;
+    width: fit-content;
+}
+
+#el-container-infos-website .el-circle {
+    position: absolute;
+    bottom: .15rem;
+    right: .25rem;
+    width: 15px;
+    height: 15px;
+    background: green;
+    border-radius: 50%;
+}
+
+#el-container-infos-website .el-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0 !important;
+}
+
+#el-container-infos-website .el-sector {
+    font-size: .8rem;
+    color: #646468;
+    margin: 0 !important;
+}
+
+#el-container-infos-website .el-content {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    padding: 1rem;
+    background-color: #f4f7f9;
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, .15);
+}
+
+#el-container-infos-website .el-content .el-block {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid #eee;
+}
+
+#el-container-infos-website .el-content .el-block:last-of-type {
+    padding-bottom: 0;
+    border: none;
+}
+
+#el-container-infos-website .el-content .el-legend {
+    font-size: .9rem;
+    text-transform: capitalize;
+    color: #333;
+}
+
+#el-container-infos-website .el-content .el-value {
+    font-size: .85rem;
+    margin: 0;
+    color: #646468;
+}
+
+/* #el-header-page-site-overview{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+} */
+.el-container-stats {
+    display: grid;
+    width: 100%;
+    gap: 1rem;
+    grid-template-areas: "info state1 state2 state3"
+        "info state4 state5 state6";
+    padding: 1rem;
+}
+
+.el-container-stats .mat-mdc-card:nth-child(1) {
+    grid-area: info;
+}
+
+.el-container-stats .mat-mdc-card:nth-child(2) {
+    grid-area: state1;
+}
+
+.el-container-stats .mat-mdc-card:nth-child(3) {
+    grid-area: state2;
+}
+
+.el-container-stats .mat-mdc-card:nth-child(4) {
+    grid-area: state3;
+}
+
+.el-container-stats .mat-mdc-card:nth-child(5) {
+    grid-area: state4;
+}
+
+.el-container-stats .mat-mdc-card:nth-child(6) {
+    grid-area: state5;
+}
+
+.el-container-stats .mat-mdc-card:nth-child(7) {
+    grid-area: state6;
+}
+
+.el-container-graphs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+    width: 100%;
+}
+
+.el-container-graphs .mat-mdc-card,
+.el-container-table .mat-mdc-card,
+.el-container-sources-comparaison .mat-mdc-card {
+    padding: 1rem;
+    width: 100%;
+}
+
+.el-container-table {
+    padding: 1rem;
+}
+
+
+.el-container-stats .mat-mdc-card,
+.el-container-graphs .mat-mdc-card {
+    padding: 1rem 0;
+}
+
+.el-container-stats .mat-mdc-card-content,
+.el-container-graphs .mat-mdc-card-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.mat-mdc-card-content .el-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.mat-mdc-card-content h2 {
+    font-size: 2.5rem;
+    margin: 0;
+    color: #454546;
+}
+
+.mat-mdc-card-content p {
+    font-size: .8rem;
+    margin: 0;
+    color: #707070;
+}
+
+.el-container-stats .mat-mdc-card-content .ng-fa-icon {
+    font-size: 3rem;
+    color: #ed6f01;
+}
+
+.full-width-chart {
+    width: 100%;
+    height: 300px;
+}
+
+
+.el-controls-btns{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+}
+
+.el-controls-btns .mat-mdc-card-content .ng-fa-icon {
+    font-size: 1.5rem;
+    color: #efff;
+}

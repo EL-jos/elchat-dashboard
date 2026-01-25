@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { User } from 'src/app/models/user/user';
 import { DashboardOverview, DashboardService } from 'src/app/services/dashboard/dashboard.service';
 import { UserStoreService } from 'src/app/services/user-store/user-store.service';
@@ -7,31 +7,31 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { ChartData, ChartOptions } from 'chart.js';
 import { NumberShortPipe } from 'src/app/pipes/number-short/number-short.pipe';
-
-/** --- Table Example --- */
-interface StiteElement {
-  icon: string;
-  name: string;
-  url: string;
-  status: string;
-  created_at: string;
-}
-
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { SiteBottomSheetComponent } from 'src/app/bottom-sheet/site-bottom-sheet/site-bottom-sheet.component';
+import { Site } from 'src/app/models/site/site';
+import { SiteService } from 'src/app/services/site/site.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from 'src/app/dialogs/confirm-dialog/confirm-dialog.component';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit, AfterViewInit {
+export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+
+  private destroy$ = new Subject<void>();
   // User & Stats
   user: User | null = null;
   overview: DashboardOverview | null = null;
-  ELEMENT_DATA: StiteElement[] = [];
+  sites: Site[] = [];
 
   // --- Table ---
-  displayedColumns: string[] = ['icon', 'name', 'url', 'status', 'created_at'];
-  dataSource = new MatTableDataSource<StiteElement>(this.ELEMENT_DATA);
+  displayedColumns: string[] = ['icon', 'name', 'url', 'type', 'status', 'created_at', 'action'];
+  dataSource = new MatTableDataSource<Site>(this.sites);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -74,10 +74,15 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   constructor(
     private userStore: UserStoreService,
     private dashboardService: DashboardService,
+    private siteBottomsheet: MatBottomSheet,
+    private snackBar: MatSnackBar,
+    private siteService: SiteService,
+    private dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
-    this.userStore.user$.subscribe(user => (this.user = user));
+    //this.userStore.user$.subscribe(user => (this.user = user));
+    this.userStore.user$.pipe(takeUntil(this.destroy$)).subscribe(user => this.user = user);
     this.loadOverview();
   }
 
@@ -85,12 +90,17 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.dataSource.paginator = this.paginator;
   }
 
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private loadOverview(): void {
     this.dashboardService.getOverview().subscribe({
       next: (data) => {
         this.overview = data;
-        this.ELEMENT_DATA = data.sites;
-        this.dataSource.data = this.ELEMENT_DATA;
+        this.sites = data.sites.map(Site.fromJson);
+        this.dataSource.data = this.sites;
 
         // --- Conversations par jour (concat de tous les sites) ---
         const allDates = this.collectDates(data.conversations_per_day);
@@ -162,5 +172,95 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         return 'info';
     }
   }
+
+  onCreateSite() {
+
+    type BottomSheetResult =
+      | { status: true; action: 'create' | 'update'; site: Site; message: string }
+      | { status: false };
+
+    const bottomSheetRef = this.siteBottomsheet.open(SiteBottomSheetComponent);
+
+    bottomSheetRef.afterDismissed().subscribe((res: BottomSheetResult) => {
+      if (res.status) {
+
+        if (res.action === 'create') {
+          /* this.sites = [res.site, ...this.sites];
+          this.dataSource.data = this.sites; */
+          this.loadOverview();
+        }
+
+        this.snackBar.open(res.message, "Fermer");
+      }
+
+    });
+  }
+
+  onUpdateSite(site: Site) {
+    type BottomSheetResult =
+      | { status: true; action: 'create' | 'update'; site: Site; message: string }
+      | { status: false };
+
+    const bottomSheetRef = this.siteBottomsheet.open(SiteBottomSheetComponent, {
+      data: site
+    });
+
+    bottomSheetRef.afterDismissed().subscribe((res: BottomSheetResult) => {
+
+      if (res.status) {
+
+        if (res.action === 'update') {
+          this.sites = this.sites.map(s =>
+            s.id === res.site.id ? res.site : s
+          );
+          this.dataSource.data = this.sites;
+        }
+
+        this.snackBar.open(res.message, "Fermer");
+
+      }
+
+    });
+  }
+
+  onDeleteSite(site: Site): void {
+    if (!site?.id) return;
+
+    if (site.status === 'crawling' || site.status === 'indexing') {
+      this.snackBar.open('⏳ Impossible de supprimer un site en cours de traitement.', "Fermer");
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '420px',
+      data: {
+        title: 'Supprimer le site',
+        message:
+          `⚠️ Voulez-vous vraiment supprimer le site "${site.name}" ?\n` +
+          `Cette action est irréversible.`
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+
+      this.siteService.deleteSite(site.id!).subscribe({
+        next: () => {
+          // 🔥 retirer le site supprimé de la liste
+          /* this.sites = this.sites.filter(s => s.id !== site.id);
+          this.dataSource.data = this.sites; */
+          this.loadOverview();
+
+          this.snackBar.open('✅ Site supprimé avec succès', "Fermer");
+        },
+        error: err => {
+          this.snackBar.open('❌ Erreur suppression site' + err, "Fermer");
+        }
+      });
+    });
+
+
+  }
+
 
 }

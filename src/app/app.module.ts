@@ -44,6 +44,12 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { CardModule } from 'primeng/card';
 import { NumberShortPipe } from './pipes/number-short/number-short.pipe';
 import { TagModule } from 'primeng/tag';
+import { SiteBottomSheetComponent } from './bottom-sheet/site-bottom-sheet/site-bottom-sheet.component';
+import { FileUploadModule } from 'primeng/fileupload';
+import {MatStepperModule} from '@angular/material/stepper';
+import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
+import { SiteComponent } from './pages/site/site.component';
+import { TruncatePipe } from './pipes/truncate/truncate.pipe';
 
 registerLocaleData(localeFr, 'fr');
 @NgModule({
@@ -55,7 +61,11 @@ registerLocaleData(localeFr, 'fr');
     SignUpComponent,
     VerificationComponent,
     DashboardComponent,
-    NumberShortPipe
+    NumberShortPipe,
+    SiteBottomSheetComponent,
+    ConfirmDialogComponent,
+    SiteComponent,
+    TruncatePipe
   ],
   imports: [
     BrowserModule,
@@ -90,7 +100,9 @@ registerLocaleData(localeFr, 'fr');
     MatNativeDateModule,
     MatCardModule,
     CardModule,
-    TagModule
+    TagModule,
+    FileUploadModule,
+    MatStepperModule
   ],
   providers: [
     MatDatepickerModule,

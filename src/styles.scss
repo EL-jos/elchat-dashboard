@@ -19,8 +19,8 @@ body {
 
 
 * {
-    margin: 0;
-    padding: 0;
+    /* margin: 0;
+    padding: 0; */
     box-sizing: border-box;
 }
 
@@ -83,6 +83,10 @@ body {
     button#el-create {
         background: #1186d4;
         color: #fff;
+        padding: 0 1rem;
+        .ng-fa-icon{
+            font: 1.5rem;
+        }
     }
 }
 
@@ -627,4 +631,8 @@ form.el-chat-input-area .el-btn-send-message img {
     width: 20px;
     height: 20px;
     filter: invert(1);
+}
+
+app-site{
+    width: 100%;
 }
