@@ -1,0 +1,94 @@
+.el-settings-container {
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 0 1px #dadce0;
+
+    h2 {
+        margin: 0;
+        color: #333;
+        font-size: 1.2rem;
+    }
+
+    p {
+        margin: 0;
+        color: #686864;
+        font-size: .9rem;
+    }
+
+    .snippet-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        width: 100%;
+        position: relative;
+
+        pre {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+
+        .code-snippet {
+            background: #1e1e1e; // fond sombre VSCode
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            position: relative;
+
+            .tag {
+                color: #569cd6; // bleu pour les balises
+                font-weight: bold;
+            }
+
+            .comment {
+                color: #6a9955; // vert pour les commentaires
+                font-style: italic;
+            }
+        }
+    }
+
+    .el-copy {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        color: #888;
+        transition: color 0.2s;
+
+        &:hover {
+            color: #000;
+        }
+    }
+
+    button {
+        width: fit-content;
+    }
+}
+
+.copied-feedback {
+    position: absolute;
+    top: 0.5rem;
+    right: 3rem;
+    color: #4caf50;
+    font-weight: bold;
+    animation: fadeout 1.5s forwards;
+}
+
+@keyframes fadeout {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}

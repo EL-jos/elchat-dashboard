@@ -1,172 +1,31 @@
-<div class="el-container-stats" *ngIf="overview">
-    <mat-card>
-        <mat-card-title>Informations du site</mat-card-title>
-        <mat-card-content>
-            <div id="el-container-infos-website">
-                <div class="el-container-logo">
-                    <div class="el-logo">
-                        <img [src]="site.favicon" alt="">
-                    </div>
-                    <div class="el-circle"></div>
-                </div>
-                <h2 class="el-name">{{ site.name }}</h2>
-                <p class="el-sector">{{ site.type?.name }}</p>
-                <div class="el-content">
-                    <div class="el-block">
-                        <span class="el-legend">url</span>
-                        <p class="el-value"><a [href]="site.url" target="_blank">{{ site.url }}</a></p>
-                    </div>
-                    <div class="el-block">
-                        <span class="el-legend">status</span>
-                        <p class="el-value">{{ site.status }}</p>
-                    </div>
-                    <div class="el-block">
-                        <span class="el-legend">Crée le</span>
-                        <p class="el-value">{{ site.created_at | date: 'dd/MM/yyyy' }}</p>
-                    </div>
-                    <div class="el-block">
-                        <span class="el-legend">Nb. pages</span>
-                        <p class="el-value">{{ overview.kpis.nb_pages || 0 }} </p>
-                    </div>
-                    <div class="el-block">
-                        <span class="el-legend">Compte</span>
-                        <p class="el-value">{{ site.account?.name | uppercase}}</p>
-                    </div>
-                </div>
-            </div>
-        </mat-card-content>
-    </mat-card>
-    <mat-card>
-        <mat-card-content>
-            <fa-icon [icon]="icons.chunks"></fa-icon>
-            <div class="el-container">
-                <h2>{{ overview.kpis.chunks | numberShort:2 }}</h2>
-                <p>Nombre total de chunks</p>
-            </div>
-        </mat-card-content>
-    </mat-card>
-    <mat-card>
-        <mat-card-content>
-            <fa-icon [icon]="icons.documents"></fa-icon>
-            <div class="el-container">
-                <h2> {{ overview.kpis.documents | numberShort:2 }} </h2>
-                <p>Nombre total de documents indexés</p>
-            </div>
-        </mat-card-content>
-    </mat-card>
-    <mat-card>
-        <mat-card-content>
-            <fa-icon [icon]="icons.users"></fa-icon>
-            <div class="el-container">
-                <h2> {{ overview.kpis.users | numberShort:2 }} </h2>
-                <p>Nombre total d'utilisateurs</p>
-            </div>
-        </mat-card-content>
-    </mat-card>
-    <mat-card>
-        <mat-card-content>
-            <fa-icon [icon]="icons.conversations"></fa-icon>
-            <div class="el-container">
-                <h2> {{ overview.kpis.conversations | numberShort:2 }} </h2>
-                <p>Nombre total de conversations</p>
-            </div>
-        </mat-card-content>
-    </mat-card>
-    <mat-card>
-        <mat-card-content>
-            <fa-icon [icon]="icons.messages"></fa-icon>
-            <div class="el-container">
-                <h2> {{ overview.kpis.messages | numberShort:2 }} </h2>
-                <p>Nombre total de messages (user/bot)</p>
-            </div>
-        </mat-card-content>
-    </mat-card>
-</div>
+<mat-tab-group *ngIf="overview">
 
-<div class="el-container-graphs">
-    <mat-card>
-        <mat-card-title>Conversations par jour</mat-card-title>
-        <mat-card-content>
-            <p-chart class="full-width-chart" type="line" [data]="conversationsChartData"
-                [options]="conversationsChartOptions"></p-chart>
-        </mat-card-content>
-    </mat-card>
-    <mat-card>
-        <mat-card-title>Messages IA par jour</mat-card-title>
-        <mat-card-content>
-            <p-chart class="full-width-chart" type="line" [data]="messagesChartData"
-                [options]="messagesChartOptions"></p-chart>
-        </mat-card-content>
-    </mat-card>
-    <mat-card>
-        <mat-card-title>Répartition sources</mat-card-title>
-        <mat-card-content>
-            <p-chart class="full-width-chart" type="pie" [data]="sourcesChartData"
-                [options]="sourcesChartOptions"></p-chart>
-        </mat-card-content>
-    </mat-card>
-</div>
+  <mat-tab label="Overview">
+    <app-site-overview
+      [overview]="overview"
+      (crawl)="crawl()"
+      (reindex)="reindex()">
+    </app-site-overview>
+  </mat-tab>
 
-<div class="el-container-table" style="padding: 0 1rem 1rem;">
-    <mat-card>
-        <mat-card-title>Listes des utilisateurs</mat-card-title>
-        <mat-card-content>
+  <mat-tab label="Pages">
+    <app-site-pages [siteId]="siteId"></app-site-pages>
+  </mat-tab>
 
-            <table mat-table [dataSource]="dataSource">
+  <mat-tab label="Crawl">
+    <app-site-crawl [overview]="overview"></app-site-crawl>
+  </mat-tab>
 
-                <!-- Icon Column -->
-                <ng-container matColumnDef="firstname">
-                    <th mat-header-cell *matHeaderCellDef> Firstname </th>
-                    <td mat-cell *matCellDef="let element"> {{ element.firstname | truncate:40 }} </td>
-                </ng-container>
+  <mat-tab label="Users">
+    <app-site-users></app-site-users>
+  </mat-tab>
 
+  <mat-tab label="Conversations">
+    <app-site-conversations></app-site-conversations>
+  </mat-tab>
 
+  <mat-tab label="Settings">
+    <app-site-settings [settings]="overview.settings" [site]="overview.site"></app-site-settings>
+  </mat-tab>
 
-                <!-- Name Column -->
-                <ng-container matColumnDef="lastname">
-                    <th mat-header-cell *matHeaderCellDef> Lastname </th>
-                    <td mat-cell *matCellDef="let element"> {{ element.lastname | truncate:40 }} </td>
-                </ng-container>
-
-                <!-- URL Column -->
-                <ng-container matColumnDef="email">
-                    <th mat-header-cell *matHeaderCellDef> E-mail </th>
-                    <td mat-cell *matCellDef="let element"> {{ element.email }} </td>
-                </ng-container>
-
-                <!-- Type Column -->
-                <ng-container matColumnDef="first_seen_at">
-                    <th mat-header-cell *matHeaderCellDef> First seen at </th>
-                    <td mat-cell *matCellDef="let element"> {{ site.getPivot(element.id)?.first_seen_at | date:'dd/MM/yyyy' }} </td>
-                </ng-container>
-
-                <!-- Status Column -->
-                <ng-container matColumnDef="last_seen_at">
-                    <th mat-header-cell *matHeaderCellDef> Last seen at </th>
-                    <td mat-cell *matCellDef="let element"> {{ site.getPivot(element.id)?.last_seen_at | date:'dd/MM/yyyy' }} </td>
-                </ng-container>
-
-                <ng-container matColumnDef="action">
-                    <th mat-header-cell *matHeaderCellDef> Actions </th>
-                    <td mat-cell *matCellDef="let element">
-                        <button mat-icon-button [matMenuTriggerFor]="menu"> <mat-icon>more_vert</mat-icon></button>
-                        <mat-menu #menu="matMenu">
-                            <button mat-menu-item routerLink="/site/{{element.id}}"> <mat-icon>remove_red_eye</mat-icon>
-                                Voir</button>
-                            <button mat-menu-item> <mat-icon>edit</mat-icon>
-                                Modifier</button>
-                            <button mat-menu-item> <mat-icon>delete</mat-icon>
-                                Supprimer</button>
-                        </mat-menu>
-                    </td>
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-            </table>
-            <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
-                aria-label="Select page of periodic elements">
-            </mat-paginator>
-        </mat-card-content>
-    </mat-card>
-</div>
+</mat-tab-group>

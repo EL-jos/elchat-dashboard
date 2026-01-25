@@ -50,6 +50,13 @@ import {MatStepperModule} from '@angular/material/stepper';
 import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
 import { SiteComponent } from './pages/site/site.component';
 import { TruncatePipe } from './pipes/truncate/truncate.pipe';
+import { SiteOverviewComponent } from './pages/site/site-overview/site-overview.component';
+import { SitePagesComponent } from './pages/site/site-pages/site-pages.component';
+import { SiteCrawlComponent } from './pages/site/site-crawl/site-crawl.component';
+import { SiteSettingsComponent } from './pages/site/site-settings/site-settings.component';
+import { SiteConversationsComponent } from './pages/site/site-conversations/site-conversations.component';
+import { SiteUsersComponent } from './pages/site/site-users/site-users.component';
+
 
 registerLocaleData(localeFr, 'fr');
 @NgModule({
@@ -65,7 +72,13 @@ registerLocaleData(localeFr, 'fr');
     SiteBottomSheetComponent,
     ConfirmDialogComponent,
     SiteComponent,
-    TruncatePipe
+    TruncatePipe,
+    SiteOverviewComponent,
+    SitePagesComponent,
+    SiteCrawlComponent,
+    SiteSettingsComponent,
+    SiteConversationsComponent,
+    SiteUsersComponent
   ],
   imports: [
     BrowserModule,

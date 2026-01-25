@@ -1,0 +1,74 @@
+.el-container-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    padding: 0 1rem;
+    width: 100%;
+}
+
+.el-container-stats .mat-mdc-card {
+    padding: 1rem 0;
+}
+
+.el-container-stats .mat-mdc-card-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.mat-mdc-card-content .el-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.mat-mdc-card-content h2 {
+    font-size: 2.5rem;
+    margin: 0;
+    color: #454546;
+}
+
+.mat-mdc-card-content p {
+    font-size: .8rem;
+    margin: 0;
+    color: #707070;
+}
+
+.el-container-stats .mat-mdc-card-content .ng-fa-icon {
+    font-size: 3rem;
+    color: #ed6f01;
+}
+
+.el-container-table .mat-mdc-card {
+    padding: 1rem;
+}
+
+.el-container-table {
+    padding: 1rem;
+}
+
+.el-controls-btns{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+}
+
+.el-controls-btns .mat-mdc-card-content .ng-fa-icon {
+    font-size: 1.5rem;
+    color: #efff;
+}
+
+/* Status colors pour les pages */
+fa-icon.indexed { color: #2e7d32; }      /* vert pour pages indexées */
+fa-icon.excluded { color: #ed6c02; }     /* orange pour pages exclues */
+.ng-fa-icon.error { color: #d32f2f; }        /* rouge pour pages en erreur */
+
+/* Nouveaux status venant du crawl */
+.ng-fa-icon.pending { color: #f9a825; }      /* jaune pour pending */
+.ng-fa-icon.processing { color: #0288d1; }   /* bleu pour processing */
+.ng-fa-icon.done { color: #2e7d32; }         /* vert pour done */
+

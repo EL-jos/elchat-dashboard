@@ -1,0 +1,154 @@
+<div class="el-container-stats" *ngIf="stats">
+
+    <mat-card>
+        <mat-card-content>
+            <fa-icon [icon]="icons.pages"></fa-icon>
+            <div class="el-container">
+                <h2>{{ stats.total_pages | numberShort:2 }}</h2>
+                <p>Nombre total de pages</p>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+        <mat-card-content>
+            <fa-icon [icon]="icons.indexed" class="success"></fa-icon>
+            <div class="el-container">
+                <h2>{{ stats.indexed_pages | numberShort:2 }}</h2>
+                <p>Pages indexées</p>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+        <mat-card-content>
+            <fa-icon [icon]="icons.excluded" class="warning"></fa-icon>
+            <div class="el-container">
+                <h2>{{ stats.excluded_pages | numberShort:2 }}</h2>
+                <p>Pages exclues</p>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+        <mat-card-content>
+            <fa-icon [icon]="icons.error" class="danger"></fa-icon>
+            <div class="el-container">
+                <h2>{{ stats.error_pages | numberShort:2 }}</h2>
+                <p>Pages en erreur</p>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+        <mat-card-content>
+            <fa-icon [icon]="icons.chunks"></fa-icon>
+            <div class="el-container">
+                <h2>{{ stats.total_chunks | numberShort:2 }}</h2>
+                <p>Total des chunks générés</p>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+</div>
+
+<div class="el-container-table">
+    <mat-card>
+        <mat-card-title>Listes des sites web</mat-card-title>
+        <mat-card-content>
+
+            <table mat-table [dataSource]="dataSource">
+
+                <!-- Icon Column -->
+                <ng-container matColumnDef="icon">
+                    <th mat-header-cell *matHeaderCellDef> Icone </th>
+                    <td mat-cell *matCellDef="let element">
+                        <img [src]="site.favicon" [alt]="element.title"
+                            style="width: 30px; border-radius: 50%; box-shadow: 0 0 5px rgba(0, 0, 0, .15);">
+                    </td>
+                </ng-container>
+
+
+
+                <!-- Name Column -->
+                <ng-container matColumnDef="title">
+                    <th mat-header-cell *matHeaderCellDef> Title </th>
+                    <td mat-cell *matCellDef="let element"> <p style="margin: 0;" [title]="element.title">{{element.title | truncate:40}}</p> </td>
+                </ng-container>
+
+                <!-- URL Column -->
+                <ng-container matColumnDef="url">
+                    <th mat-header-cell *matHeaderCellDef> URL </th>
+                    <td mat-cell *matCellDef="let element"> 
+                        <a [href]="element.url" [title]="element.url" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: .5rem;">
+                            {{element.url | truncate:40}}
+                            <fa-icon [icon]="icons.externalLink"></fa-icon>
+                        </a>
+                    </td>
+                </ng-container>
+
+                <!-- Type Column -->
+                <ng-container matColumnDef="source">
+                    <th mat-header-cell *matHeaderCellDef> Source </th>
+                    <td mat-cell *matCellDef="let element"> {{element.source}} </td>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="chunks_count">
+                    <th mat-header-cell *matHeaderCellDef> Chunks count </th>
+                    <td mat-cell *matCellDef="let element"> {{element.chunks_count | numberShort:2}} </td>
+                </ng-container>
+
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="is_indexed">
+                    <th mat-header-cell *matHeaderCellDef> Is indexed </th>
+                    <td mat-cell *matCellDef="let element"> {{element.is_indexed ? 'Yes' : 'No' }} </td>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef> Status </th>
+                    <td mat-cell *matCellDef="let element">
+                        <div style="display: flex; align-items: center; gap: .5rem;">
+                            <fa-icon [icon]="getIconForStatus(element.status)" [ngClass]="element.status"></fa-icon>
+                            {{element.status}}
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- Created At Column -->
+                <ng-container matColumnDef="created_at">
+                    <th mat-header-cell *matHeaderCellDef> Created At </th>
+                    <td mat-cell *matCellDef="let element"> {{element.created_at | date: 'dd/mm/YYYY'}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="action">
+                    <th mat-header-cell *matHeaderCellDef> Actions </th>
+                    <td mat-cell *matCellDef="let element">
+                        <button mat-icon-button [matMenuTriggerFor]="menu"> <mat-icon>more_vert</mat-icon></button>
+                        <mat-menu #menu="matMenu">
+                            <button mat-menu-item routerLink="/site/{{element.id}}"> <mat-icon>remove_red_eye</mat-icon>
+                                Voir</button>
+                            <button mat-menu-item (click)="onUpdateSite(element)"> <mat-icon>edit</mat-icon>
+                                Modifier</button>
+                            <button mat-menu-item (click)="onDeleteSite(element)"> <mat-icon>delete</mat-icon>
+                                Supprimer</button>
+                            <mat-divider></mat-divider>
+                            <button mat-menu-item (click)="recrawl(element)">
+                                <fa-icon [icon]="icons.recrawl"></fa-icon> Recrawl</button>
+                            <button mat-menu-item (click)="toggleIndex(element)">
+                                <fa-icon [icon]="icons.toggleIndex"></fa-icon> Toggle Index</button>
+                        </mat-menu>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+            <mat-paginator [pageSizeOptions]="[10, 20, 50]" showFirstLastButtons
+                aria-label="Select page of periodic elements">
+            </mat-paginator>
+        </mat-card-content>
+    </mat-card>
+</div>
