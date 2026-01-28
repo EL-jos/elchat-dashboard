@@ -7,6 +7,7 @@
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 0 0 1px #dadce0;
+    margin-top: 1rem;
 
     h2 {
         margin: 0;
@@ -91,4 +92,109 @@
     100% {
         opacity: 0;
     }
+}
+
+app-site-settings {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 80dvh;
+}
+
+.el-container-tester {
+    width: 100%;
+    border: solid 1px #dadce0;
+    border-radius: 4px;
+    display: flex;
+    height: 40px;
+    align-items: center;
+    overflow: hidden;
+
+    input {
+        outline: none;
+        border: none;
+        box-shadow: none;
+        border-right: solid 1px #dadce0;
+        padding-left: 1rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+
+    button {
+        outline: none;
+        border: none;
+        box-shadow: none;
+        width: 150px;
+        height: 100%;
+        cursor: pointer;
+        display: flex;
+        font-weight: 600;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        background: none;
+        transition: all .3s ease;
+    }
+
+    button:hover {
+        background-color: rgba(242, 242, 242, .3);
+    }
+    button:disabled{
+        background-color: var(--disabled-bg);
+        cursor: not-allowed;
+    }
+}
+
+.test-result {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: .5rem;
+    width: fit-content;
+    padding: 1rem;
+    border-radius: 4px;
+
+    .ng-fa-icon {
+        font-size: 1.25rem;
+    }
+
+    .ng-fa-icon.success {
+        color: var(--success-color);
+    }
+
+    .ng-fa-icon.error {
+        color: var(--error-color);
+    }
+
+    .ng-fa-icon.disabled {
+        color: var(--disabled-color);
+    }
+}
+
+.test-result.success {
+    background-color: var(--success-bg);
+    color: var(--success-color);
+}
+
+.test-result.error {
+    background-color: var(--error-bg);
+    color: var(--error-color);
+}
+
+.test-result.disabled {
+    background-color: var(--disabled-bg);
+    color: var(--disabled-color);
+}
+
+.el-container-input{
+    margin-top: 2rem;
+}
+.el-btns-control-stepper{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: fit-content;
 }

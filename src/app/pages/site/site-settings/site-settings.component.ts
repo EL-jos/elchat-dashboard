@@ -2,6 +2,10 @@ import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { faCheckCircle, faTimesCircle, faCopy } from '@fortawesome/free-solid-svg-icons';
+import { NgForm } from '@angular/forms';
+import { WidgetSetting } from 'src/app/models/widget-setting/widget-setting';
+import { SiteService } from 'src/app/services/site/site.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-site-settings',
@@ -12,8 +16,10 @@ import { faCheckCircle, faTimesCircle, faCopy } from '@fortawesome/free-solid-sv
 export class SiteSettingsComponent implements OnInit {
 
   @Input() site!: { id: string; name: string; url: string; };
+  @Input() settings!: WidgetSetting;
 
   widgetSnippet: string = '';
+  rawSnippet: string = '';
   testing = false;
   testResult: string | null = null;
   copied = false;
@@ -25,61 +31,32 @@ export class SiteSettingsComponent implements OnInit {
     copy: faCopy
   };
 
-  constructor(private http: HttpClient) { }
+  button_position: string[] = ['bottom-right', 'bottom-left', 'top-right', 'top-left'];
+  widgetSetting: WidgetSetting = new WidgetSetting();
+
+  constructor(
+    private http: HttpClient,
+    private siteService: SiteService,
+        private snackBar: MatSnackBar,
+  ) { }
 
   ngOnInit(): void {
+    console.log(this.settings);
+    
     if (!this.site?.id) return;
 
-    const rawSnippet = `
+    this.siteService.getWidgetSettings(this.site.id).subscribe(setting => {
+      this.widgetSetting = setting;
+    });
+
+    this.rawSnippet = `
       <!-- ELChat tag (elchat.js) -->
-      <script async src="https://www.domain.com/elchat/js?id=${this.site.id}"></script>
-      <script>
-        (function() {
-          // 1️⃣ Créer le bouton flottant
-          const btn = document.createElement('button');
-          btn.innerText = '💬 Chat avec ELChat';
-          btn.id = 'elchat-btn';
-          Object.assign(btn.style, {
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            zIndex: 9999,
-            padding: '12px 20px',
-            borderRadius: '25px',
-            background: '#6200ee',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: '16px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.2)'
-          });
-          document.body.appendChild(btn);
-
-          // 2️⃣ Ajouter le conteneur de l'iframe (invisible au départ)
-          const iframe = document.createElement('iframe');
-          iframe.src = 'https://www.domain.com/elchat/widget?site_id=' + encodeURIComponent('SITE_ID_ICI');
-          iframe.style.position = 'fixed';
-          iframe.style.bottom = '70px';
-          iframe.style.right = '20px';
-          iframe.style.width = '400px';
-          iframe.style.height = '500px';
-          iframe.style.border = '1px solid #ccc';
-          iframe.style.borderRadius = '10px';
-          iframe.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-          iframe.style.zIndex = 9999;
-          iframe.style.display = 'none';
-          document.body.appendChild(iframe);
-
-          // 3️⃣ Afficher l'iframe au clic sur le bouton
-          btn.addEventListener('click', () => {
-            iframe.style.display = iframe.style.display === 'none' ? 'block' : 'none';
-          });
-        })();
-      </script>
-    `;
+      <script async src="http://localhost:8000/js/widget.js" data-site-id="${this.site.id}"></script>
+      <!-- END ELChat tag (elchat.js) -->
+    `;//URL doit être le domaine où widget.js sera hébergé
 
     // transformer les caractères spéciaux en entités HTML et ajouter coloration simple
-    this.widgetSnippet = rawSnippet
+    this.widgetSnippet = this.rawSnippet
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/(&lt;!--.*--&gt;)/g, '<span class="comment">$1</span>')
@@ -91,7 +68,7 @@ export class SiteSettingsComponent implements OnInit {
 
   // 🔹 Copier le snippet dans le presse-papiers
   copySnippet(): void {
-    navigator.clipboard.writeText(this.widgetSnippet).then(() => {
+    navigator.clipboard.writeText(this.rawSnippet).then(() => {
       this.copied = true;
       setTimeout(() => this.copied = false, 1500);
     });
@@ -113,6 +90,16 @@ export class SiteSettingsComponent implements OnInit {
         this.testing = false;
         this.testResult = 'error';
       }
+    });
+  }
+
+  onSubmit(settingsWidget: NgForm) {
+    console.log(settingsWidget.value);
+    this.siteService.updateWidgetSettings(this.widgetSetting.id!, this.widgetSetting).subscribe(updated => {
+      console.log(updated);
+      
+      this.widgetSetting = updated;
+      this.snackBar.open("Updated settings", "Fermer")
     });
   }
 

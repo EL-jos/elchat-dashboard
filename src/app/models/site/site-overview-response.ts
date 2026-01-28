@@ -1,4 +1,5 @@
 import { User } from "../user/user";
+import { WidgetSetting } from "../widget-setting/widget-setting";
 
 export interface SiteOverviewResponse {
   site: {
@@ -36,7 +37,7 @@ export interface SiteOverviewResponse {
     by_source: { crawl: number; sitemap: number; manuel: number; woocommerce: number };
   };
   users: User[];
-  settings: {
+  settings_crawl: {
     language: string;
     crawl_depth: number;
     crawl_delay: number;
@@ -45,4 +46,5 @@ export interface SiteOverviewResponse {
     system_prompt: string;
     updated_at: string;
   };
+  settings: WidgetSetting
 }

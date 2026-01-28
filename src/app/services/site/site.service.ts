@@ -12,6 +12,7 @@ import { User } from 'src/app/models/user/user';
 import { SiteActivity } from 'src/app/models/site/site-activity';
 import { SiteOverview } from 'src/app/models/site/site-overview';
 import { SiteOverviewResponse } from 'src/app/models/site/site-overview-response';
+import { WidgetSetting } from 'src/app/models/widget-setting/widget-setting';
 
 @Injectable({ providedIn: 'root' })
 export class SiteService {
@@ -134,5 +135,27 @@ export class SiteService {
     ).pipe(
       map(Document.fromJson)
     );
+  }
+
+  // ==================================================
+  // ⚙️ Widget Settings
+  // ==================================================
+
+  getWidgetSettings(siteId: string): Observable<WidgetSetting> {
+    return this.http
+      .get<{ data: any }>(`${this.api}/site/${siteId}/widget/setting`)
+      .pipe(map(res => WidgetSetting.fromJson(res.data)));
+  }
+
+  updateWidgetSettings(
+    widgetSettingId: string,
+    payload: Partial<WidgetSetting>
+  ): Observable<WidgetSetting> {
+    return this.http
+      .put<{ data: any }>(
+        `${this.api}/widget_setting/${widgetSettingId}`,
+        payload
+      )
+      .pipe(map(res => WidgetSetting.fromJson(res.data)));
   }
 }

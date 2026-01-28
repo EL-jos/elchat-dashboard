@@ -1,36 +1,286 @@
-<div class="el-settings-container">
+<mat-card>
+    <mat-card-content>
+        <form #settingsWidget="ngForm" (ngSubmit)="onSubmit(settingsWidget)">
+            <mat-stepper orientation="vertical" [linear]="false" #stepper>
+                <mat-step>
+                    <ng-template matStepLabel>Installation du widget ELChat</ng-template>
+                    <div class="el-settings-container">
+                        <p>Pour permettre aux visiteurs de discuter avec l’IA, ajoutez ce snippet dans le
+                            <strong>head</strong> de votre
+                            site :
+                        </p>
 
-    <h2>Installation du widget ELChat</h2>
-    <p>Pour permettre aux visiteurs de discuter avec l’IA, ajoutez ce snippet dans le <strong>head</strong> de votre
-        site :</p>
+                        <mat-card>
+                            <mat-card-content class="snippet-card">
+                                <pre [innerHTML]="widgetSnippet" class="code-snippet"></pre>
 
-    <mat-card>
-        <mat-card-content class="snippet-card">
-            <pre [innerHTML]="widgetSnippet" class="code-snippet"></pre>
+                                <button class="el-copy" mat-icon-button matTooltip="Copier le snippet"
+                                    (click)="copySnippet()">
+                                    <fa-icon [icon]="icons.copy"></fa-icon>
+                                </button>
 
-            <button class="el-copy" mat-icon-button matTooltip="Copier le snippet" (click)="copySnippet()">
-                <fa-icon [icon]="icons.copy"></fa-icon>
-            </button>
+                                <span *ngIf="copied" class="copied-feedback">✔ Copié !</span>
+                            </mat-card-content>
+                        </mat-card>
 
-            <span *ngIf="copied" class="copied-feedback">✔ Copié !</span>
-        </mat-card-content>
-    </mat-card>
+                        <p>Après avoir ajouté le snippet, vous pouvez tester la connexion :</p>
+                        <div class="el-container-tester">
+                            <input class="el-url" [value]="site.url" />
+                            <button (click)="testWidget()" [disabled]="testing">
+                                {{ testing ? 'Test en cours...' : 'Tester le widget' }}
+                            </button>
+                        </div>
 
+                        <div *ngIf="testResult" class="test-result"
+                            [ngClass]="{'test-result': true, 'success': testResult==='connected', 'error': testResult==='error' || testResult==='disconnected'}">
+                            <fa-icon *ngIf="testResult==='connected'" [icon]="icons.success" class="success"></fa-icon>
+                            <fa-icon *ngIf="testResult==='disconnected'" [icon]="icons.error" class="error"></fa-icon>
+                            <fa-icon *ngIf="testResult==='error'" [icon]="icons.error" class="error"></fa-icon>
 
-    <p>Après avoir ajouté le snippet, vous pouvez tester la connexion :</p>
+                            <span *ngIf="testResult==='connected'">Widget connecté et opérationnel sur <strong>{{
+                                    site.name
+                                    | uppercase}}</strong> </span>
+                            <span *ngIf="testResult==='disconnected'">Widget non détecté sur ce site sur <strong>{{
+                                    site.name | uppercase}}</strong> </span>
+                            <span *ngIf="testResult==='error'">Erreur lors du test du widget sur <strong>{{ site.name |
+                                    uppercase}}</strong> </span>
+                        </div>
 
-    <button mat-raised-button color="primary" (click)="testWidget()" [disabled]="testing">
-        {{ testing ? 'Test en cours...' : 'Tester le widget' }}
-    </button>
-
-    <div *ngIf="testResult" class="test-result">
-        <fa-icon *ngIf="testResult==='connected'" [icon]="icons.success" class="success"></fa-icon>
-        <fa-icon *ngIf="testResult==='disconnected'" [icon]="icons.error" class="error"></fa-icon>
-        <fa-icon *ngIf="testResult==='error'" [icon]="icons.error" class="error"></fa-icon>
-
-        <span *ngIf="testResult==='connected'">✅ Widget connecté et opérationnel</span>
-        <span *ngIf="testResult==='disconnected'">❌ Widget non détecté sur ce site</span>
-        <span *ngIf="testResult==='error'">❌ Erreur lors du test du widget</span>
-    </div>
-
-</div>
+                    </div>
+                    <div class="el-btns-control-stepper" style="margin-top: 1rem;">
+                        <button type="button" mat-raised-button color="primary" matStepperNext>Next</button>
+                    </div>
+                </mat-step>
+                <mat-step>
+                    <ng-template matStepLabel>Button settings</ng-template>
+                    <div class="el-container-input">
+                        <div class="el-row">
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Text</mat-label>
+                                    <input matInput placeholder="💬 Chat" [(ngModel)]="widgetSetting.button_text"
+                                        name="button_text" />
+                                </mat-form-field>
+                            </div>
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Background</mat-label>
+                                    <input matInput type="color" [(ngModel)]="widgetSetting.button_background"
+                                        name="button_background" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="el-row">
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Color</mat-label>
+                                    <input matInput type="color" [(ngModel)]="widgetSetting.button_color"
+                                        name="button_color" />
+                                </mat-form-field>
+                            </div>
+                            <div class="el-col">
+                                <mat-form-field>
+                                    <mat-label>Position</mat-label>
+                                    <mat-select [(ngModel)]="widgetSetting.button_position" name="button_position">
+                                        <mat-option *ngFor="let position of button_position"
+                                            [value]="position">
+                                            {{position}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="el-row">
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Offset_X</mat-label>
+                                    <input matInput type="text" [(ngModel)]="widgetSetting.button_offset_x"
+                                        name="button_offset_x" />
+                                </mat-form-field>
+                            </div>
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Offset_Y</mat-label>
+                                    <input matInput type="text" [(ngModel)]="widgetSetting.button_offset_y"
+                                        name="button_offset_y" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="el-btns-control-stepper">
+                        <button type="button" mat-button matStepperPrevious>Back</button>
+                        <button type="button" mat-raised-button matStepperNext color="primary">Next</button>
+                    </div>
+                </mat-step>
+                <mat-step>
+                    <ng-template matStepLabel>Widget theme</ng-template>
+                    <div class="el-container-input">
+                        <div class="el-row">
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Theme primary</mat-label>
+                                    <input type="color" matInput [(ngModel)]="widgetSetting.theme_primary"
+                                        name="theme_primary" />
+                                </mat-form-field>
+                            </div>
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Theme secondary</mat-label>
+                                    <input type="color" matInput type="color"
+                                        [(ngModel)]="widgetSetting.theme_secondary" name="theme_secondary" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="el-row">
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Theme background</mat-label>
+                                    <input matInput type="color" [(ngModel)]="widgetSetting.theme_background"
+                                        name="theme_background" />
+                                </mat-form-field>
+                            </div>
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Theme color</mat-label>
+                                    <input matInput type="color" [(ngModel)]="widgetSetting.theme_color"
+                                        name="theme_color" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="el-btns-control-stepper">
+                        <button type="button" mat-button matStepperPrevious>Back</button>
+                        <button type="button" mat-raised-button matStepperNext color="primary">Next</button>
+                    </div>
+                </mat-step>
+                <mat-step>
+                    <ng-template matStepLabel>Chat messages</ng-template>
+                    <div class="el-container-input">
+                        <div class="el-row">
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Message user background</mat-label>
+                                    <input type="color" matInput [(ngModel)]="widgetSetting.message_user_background"
+                                        name="message_user_background" />
+                                </mat-form-field>
+                            </div>
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Message user color</mat-label>
+                                    <input type="color" matInput type="color"
+                                        [(ngModel)]="widgetSetting.message_user_color" name="message_user_color" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="el-row">
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Message bot background</mat-label>
+                                    <input type="color" matInput [(ngModel)]="widgetSetting.message_bot_background"
+                                        name="message_bot_background" />
+                                </mat-form-field>
+                            </div>
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Message bot color</mat-label>
+                                    <input type="color" matInput type="color"
+                                        [(ngModel)]="widgetSetting.message_bot_color" name="message_bot_color" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="el-btns-control-stepper">
+                        <button type="button" mat-button matStepperPrevious>Back</button>
+                        <button type="button" mat-raised-button matStepperNext color="primary">Next</button>
+                    </div>
+                </mat-step>
+                <mat-step>
+                    <ng-template matStepLabel>Bot / AI configuration</ng-template>
+                    <div class="el-container-input">
+                        <div class="el-row">
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Bot name</mat-label>
+                                    <input type="text" matInput [(ngModel)]="widgetSetting.bot_name" name="bot_name"
+                                        value="ELChat" />
+                                </mat-form-field>
+                            </div>
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Bot language</mat-label>
+                                    <input type="text" matInput type="text" [(ngModel)]="widgetSetting.bot_language"
+                                        name="bot_language" value="fr" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="el-row">
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Fallback message</mat-label>
+                                    <input type="text" matInput [(ngModel)]="widgetSetting.fallback_message"
+                                        name="fallback_message"
+                                        value="Je n’ai pas trouvé cette information dans les données de notre entreprise. N’hésitez pas à nous préciser votre besoin ou à nous contacter directement." />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="el-row">
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Welcome message</mat-label>
+                                    <input type="text" matInput [(ngModel)]="widgetSetting.welcome_message"
+                                        name="welcome_message" value="Bonjour 👋 Comment puis-je vous aider ?" />
+                                </mat-form-field>
+                            </div>
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>input_placeholder</mat-label>
+                                    <input type="text" matInput type="text"
+                                        [(ngModel)]="widgetSetting.input_placeholder" name="input_placeholder"
+                                        value="Posez votre question..." />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="el-row">
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>AI temperature</mat-label>
+                                    <input type="text" matInput [(ngModel)]="widgetSetting.ai_temperature"
+                                        name="ai_temperature" value="0.70" placeholder="70" />
+                                </mat-form-field>
+                            </div>
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>AI max tokens</mat-label>
+                                    <input type="text" matInput type="text" [(ngModel)]="widgetSetting.ai_max_tokens"
+                                        name="ai_max_tokens" value="500" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="el-row">
+                            <div class="el-col">
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Min similarity score</mat-label>
+                                    <input type="number" matInput [(ngModel)]="widgetSetting.min_similarity_score"
+                                        name="min_similarity_score" value="0.30" placeholder="30" />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="el-row">
+                            <div class="el-flex-2"
+                                style="display: grid; grid-template-columns: repeat(2, 200px); width: fit-content;">
+                                <mat-slide-toggle [(ngModel)]="widgetSetting.widget_enabled" name="widget_enabled"
+                                    [checked]="true">Widget enabled</mat-slide-toggle>
+                                <mat-slide-toggle [(ngModel)]="widgetSetting.ai_enabled" name="ai_enabled"
+                                    [checked]="true">AI enabled</mat-slide-toggle>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="el-btns-control-stepper" style="margin-top: 1rem;">
+                        <button mat-button matStepperPrevious type="button">Back</button>
+                        <button mat-raised-button color="warn" type="submit">Enregistrer</button>
+                    </div>
+                </mat-step>
+            </mat-stepper>
+        </form>
+    </mat-card-content>
+</mat-card>

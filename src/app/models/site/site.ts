@@ -6,6 +6,7 @@ import { Document } from '../document/document';
 import { SiteService } from '../../services/site/site.service';
 import { User } from '../user/user';
 import { Account } from '../account/account';
+import { WidgetSetting } from '../widget-setting/widget-setting';
 
 export class Site {
     public type: TypeSite | null = null;
@@ -13,6 +14,7 @@ export class Site {
     public pages: Page[] = [];
     public conversations: Conversation[] = [];
     public documents: Document[] = [];
+    public widgetSetting: WidgetSetting | null = null;
 
     // 👥 visiteurs (lazy)
     public users: User[] = [];
@@ -76,6 +78,10 @@ export class Site {
 
         if(json.account){
             site.account = Account.fromJson(json.account);
+        }
+
+        if (json.widgetSetting) {
+            site.widgetSetting = WidgetSetting.fromJson(json.widgetSetting)
         }
 
         return site;

@@ -56,6 +56,7 @@ import { SiteCrawlComponent } from './pages/site/site-crawl/site-crawl.component
 import { SiteSettingsComponent } from './pages/site/site-settings/site-settings.component';
 import { SiteConversationsComponent } from './pages/site/site-conversations/site-conversations.component';
 import { SiteUsersComponent } from './pages/site/site-users/site-users.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 
 registerLocaleData(localeFr, 'fr');
@@ -115,7 +116,8 @@ registerLocaleData(localeFr, 'fr');
     CardModule,
     TagModule,
     FileUploadModule,
-    MatStepperModule
+    MatStepperModule,
+    MatSlideToggleModule
   ],
   providers: [
     MatDatepickerModule,

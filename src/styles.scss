@@ -5,6 +5,29 @@
     --triad-color: #f8f6f4;
     --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --font-size: 16px;
+    /* Success */
+    --success-bg: #D1E7DD;
+    --success-color: #0F5132;
+
+    /* Warning */
+    --warning-bg: #FFF3CD;
+    --warning-color: #664D03;
+
+    /* Error */
+    --error-bg: #F8D7DA;
+    --error-color: #842029;
+
+    /* Info */
+    --info-bg: #CFF4FC;
+    --info-color: #055160;
+
+    /* Enabled */
+    --enabled-bg: #E9ECEF;
+    --enabled-color: #212529;
+
+    /* Disabled */
+    --disabled-bg: #E0E0E0;
+    --disabled-color: #9E9E9E;
 }
 
 html,
@@ -84,7 +107,8 @@ body {
         background: #1186d4;
         color: #fff;
         padding: 0 1rem;
-        .ng-fa-icon{
+
+        .ng-fa-icon {
             font: 1.5rem;
         }
     }
@@ -633,6 +657,6 @@ form.el-chat-input-area .el-btn-send-message img {
     filter: invert(1);
 }
 
-app-site{
+app-site {
     width: 100%;
 }
