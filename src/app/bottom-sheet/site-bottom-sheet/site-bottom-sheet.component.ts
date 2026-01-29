@@ -65,12 +65,15 @@ export class SiteBottomSheetComponent implements OnInit {
 
     const formValue = siteFormGroup.value;
 
+    console.log(formValue);
+    
+
     const payload: Partial<Site> = {
       name: formValue.name,
       type_site_id: formValue.type_site_id,
       url: formValue.url,
-      include_pages: formValue.include_pages,
-      exclude_pages: formValue.exclude_pages,
+      include_pages: this.parseLines(formValue.include_pages),
+      exclude_pages: this.parseLines(formValue.exclude_pages),
     };
 
     // Si site existe → update, sinon create
@@ -101,12 +104,12 @@ export class SiteBottomSheetComponent implements OnInit {
     });
   }
 
-  private parseLines(value: string | undefined): string[] {
+  private parseLines(value?: string | string[]): string[] {
     if (!value) return [];
+    if (Array.isArray(value)) return value.filter(Boolean); // déjà un tableau → juste filtrer les valeurs vides
     return value
       .split(/[\n,;|]+/)
       .map(v => v.trim())
       .filter(Boolean);
   }
-
 }

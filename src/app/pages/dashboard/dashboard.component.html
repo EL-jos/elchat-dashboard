@@ -89,7 +89,7 @@
                     </td>
                 </ng-container>
 
-                
+
 
                 <!-- Name Column -->
                 <ng-container matColumnDef="name">
@@ -133,6 +133,10 @@
                                 Modifier</button>
                             <button mat-menu-item (click)="onDeleteSite(element)"> <mat-icon>delete</mat-icon>
                                 Supprimer</button>
+                            <button mat-menu-item (click)="onGenerateSitemap(element)" [disabled]="!element?.id || loading">
+                                <mat-icon>account_tree</mat-icon>
+                                Générer Sitemap
+                            </button>
                         </mat-menu>
                     </td>
                 </ng-container>

@@ -37,12 +37,12 @@ export class SiteSettingsComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private siteService: SiteService,
-        private snackBar: MatSnackBar,
+    private snackBar: MatSnackBar,
   ) { }
 
   ngOnInit(): void {
     console.log(this.settings);
-    
+
     if (!this.site?.id) return;
 
     this.siteService.getWidgetSettings(this.site.id).subscribe(setting => {
@@ -97,7 +97,7 @@ export class SiteSettingsComponent implements OnInit {
     console.log(settingsWidget.value);
     this.siteService.updateWidgetSettings(this.widgetSetting.id!, this.widgetSetting).subscribe(updated => {
       console.log(updated);
-      
+
       this.widgetSetting = updated;
       this.snackBar.open("Updated settings", "Fermer")
     });

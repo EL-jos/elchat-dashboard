@@ -23,6 +23,8 @@ import { Subject, takeUntil } from 'rxjs';
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
+  loading: boolean = false;
+        
   private destroy$ = new Subject<void>();
   // User & Stats
   user: User | null = null;
@@ -262,5 +264,31 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   }
 
+  onGenerateSitemap(site: Site): void {
+    if (!site?.id) return;
+
+    // Optionnel : loader / spinner
+    this.loading = true;
+
+    this.siteService.generateSitemap(site.id).subscribe({
+      next: (res) => {
+        this.loading = false;
+        console.log(res.message);
+
+        // Affichage notification à l’utilisateur
+        this.snackBar.open(res.message, 'OK', { duration: 3000 });
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Erreur génération sitemap', err);
+
+        this.snackBar.open(
+          'Impossible de générer le sitemap. Réessayez plus tard.',
+          'OK',
+          { duration: 5000 }
+        );
+      }
+    });
+  }
 
 }

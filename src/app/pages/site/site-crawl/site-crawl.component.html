@@ -1,1 +1,247 @@
-<p>site-crawl works!</p>
+<!-- ===============================
+ 🧠 Sources de connaissance IA
+================================ -->
+
+<mat-card class="mb-4 el-card-title">
+    <mat-card-title>Sources de connaissance</mat-card-title>
+    <mat-card-subtitle>
+        Gérez tout le contenu utilisé par votre assistant IA
+    </mat-card-subtitle>
+</mat-card>
+
+<!-- ===============================
+ ➕ Ajouter une source
+================================ -->
+
+<h3 class="mb-2 el-title-source">Ajouter une source</h3>
+<div class="el-container-sources">
+    <div class="el-grid">
+        <!-- 🌐 Crawl -->
+        <mat-card class="source-card clickable">
+            <mat-icon>public</mat-icon>
+            <h4>Site web (Crawl)</h4>
+            <p>Analyse automatique de votre site</p>
+        </mat-card>
+        <!-- 📁 Upload -->
+        <mat-card class="source-card clickable">
+            <mat-icon>upload_file</mat-icon>
+            <h4>Fichier</h4>
+            <p>CSV, Word, PDF</p>
+        </mat-card>
+        <!-- ✍️ Texte -->
+        <mat-card class="source-card clickable">
+            <mat-icon>edit</mat-icon>
+            <h4>Texte manuel</h4>
+            <p>Ajout direct de contenu</p>
+        </mat-card>
+    </div>
+</div>
+
+<!-- ===============================
+ 🌐 Crawl du site
+================================ -->
+
+<mat-card class="mt-4 el-card-crawl" *ngIf="overview">
+    <mat-card-title>Crawl du site</mat-card-title>
+
+    <form #siteForm="ngForm" (ngSubmit)="onSubmit(siteForm)">
+
+        <div class="el-row">
+            <div class="el-col">
+                <mat-form-field appearance="outline">
+                    <mat-label>URL du site web</mat-label>
+                    <input matInput name="url" [(ngModel)]="overview.site.url" required disabled>
+                </mat-form-field>
+            </div>
+
+            <div class="el-col">
+                <mat-form-field appearance="outline">
+                    <mat-label>Crawl depth</mat-label>
+                    <input matInput type="number" name="crawl_depth" [(ngModel)]="overview.settings_crawl.crawl_depth" min="1" max="5" required value="1">
+                </mat-form-field>
+            </div>
+        </div>
+
+        <div class="el-row">
+            <div class="el-col">
+                <mat-form-field appearance="outline">
+                    <mat-label>Include pages</mat-label>
+                    <textarea matInput name="include_pages" [(ngModel)]="overview.settings_crawl.include_pages"
+                        placeholder="Une URL par ligne ou séparée par , ; |"></textarea>
+                </mat-form-field>
+            </div>
+
+            <div class="el-col">
+                <mat-form-field appearance="outline">
+                    <mat-label>Exclude pages</mat-label>
+                    <textarea matInput name="exclude_pages" [(ngModel)]="overview.settings_crawl.exclude_pages"
+                        placeholder="Une URL par ligne ou séparée par , ; |"></textarea>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <div class="el-row el-row-center">
+            <mat-slide-toggle [(ngModel)]="useSitemap" name="useSitemap">
+                Utiliser un sitemap
+            </mat-slide-toggle>
+
+            <p-fileUpload *ngIf="useSitemap" mode="basic" chooseLabel="Choisir un sitemap (.xml)" [auto]="false"
+                [customUpload]="true" chooseIcon="pi pi-upload" (onSelect)="onFileSelect($event)" accept=".xml"
+                [maxFileSize]="10000000">
+            </p-fileUpload>
+        </div>
+
+        <div class="mt-4">
+            <button mat-raised-button color="primary" type="submit" [disabled]="loading">
+                {{ loading ? 'Crawl en cours...' : 'Lancer le crawl' }}
+            </button>
+        </div>
+
+    </form>
+</mat-card>
+
+
+<!-- ===============================
+ 📁 Upload de fichiers
+================================ -->
+
+<mat-card class="mt-4 el-card-upload-file">
+    <mat-card-title>Importer un fichier</mat-card-title>
+
+    <!-- <p-fileUpload name="file" mode="advanced" accept=".csv,.pdf,.doc,.docx,.txt" chooseLabel="Choisir un fichier"
+        uploadLabel="Uploader" cancelLabel="Annuler">
+    </p-fileUpload> -->
+
+    <p-fileUpload name="file" mode="advanced" accept=".csv,.xlsx,.xls" chooseLabel="Choisir un fichier"
+        uploadLabel="Uploader" cancelLabel="Annuler" [customUpload]="true" (onSelect)="onProductFileSelect($event)">
+    </p-fileUpload>
+    
+    <!-- 👇 AJOUTER À PARTIR D’ICI -->
+    <div *ngIf="showMapping" class="mapping-zone">
+    
+        <h3>Correspondance des colonnes</h3>
+    
+        <div class="mapping-row" *ngFor="let col of standardColumns">
+            <div class="left">
+                <strong>{{ col.label }}</strong>
+                <span *ngIf="col.required" class="required">*</span>
+            </div>
+    
+            <div class="right">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-select placeholder="Choisir une colonne" [(ngModel)]="mapping[col.key]" [name]="'map_' + col.key"
+                        (selectionChange)="onMappingChange()">
+    
+                        <mat-option [value]="null">
+                            — Ne pas importer —
+                        </mat-option>
+    
+                        <mat-option *ngFor="let fileCol of availableFileColumns(col.key)" [value]="fileCol">
+                            {{ fileCol }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    
+        <div class="mapping-actions">
+            <button mat-raised-button color="primary" [disabled]="!isMappingValid">
+                Uploader le fichier
+            </button>
+        </div>
+    
+    </div>
+
+    <!-- ===============================
+     👁️ Aperçu des données
+    ================================ -->
+    <div *ngIf="previewRows.length" class="preview-zone">
+    
+        <h3>Aperçu des données ({{ previewRows.length }} lignes)</h3>
+    
+        <div class="preview-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th *ngFor="let col of fileColumns">{{ col }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let row of previewRows">
+                        <td *ngFor="let col of fileColumns">
+                            {{ row[col] }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    
+    </div>
+
+</mat-card>
+
+<!-- ===============================
+ ✍️ Texte manuel
+================================ -->
+
+<mat-card class="mt-4">
+    <mat-card-title>Texte manuel</mat-card-title>
+
+    <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Titre</mat-label>
+        <input matInput placeholder="Ex: Nos coordonnées">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Contenu</mat-label>
+        <textarea matInput rows="4" placeholder="Ex: Contactez-nous à info@domaine.com">
+    </textarea>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary">
+        Ajouter à la base IA
+    </button>
+</mat-card>
+
+<!-- ===============================
+ 📚 Sources actives
+================================ -->
+
+<mat-card class="mt-4">
+    <mat-card-title>Sources actives</mat-card-title>
+
+    <p-table [value]="[]">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Nom</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-source>
+            <tr>
+                <td>{{ source.name }}</td>
+                <td>{{ source.type }}</td>
+                <td>
+                    <p-tag severity="success" value="Actif"></p-tag>
+                </td>
+                <td>
+                    <button pButton icon="pi pi-trash" class="p-button-text"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</mat-card>
+
+<!-- ===============================
+ 📊 Qualité IA
+================================ -->
+
+<mat-card class="mt-4">
+    <mat-card-title>Qualité de la connaissance</mat-card-title>
+
+    <p-progressBar [value]="75"></p-progressBar>
+    <small>Couverture estimée : bonne</small>
+</mat-card>

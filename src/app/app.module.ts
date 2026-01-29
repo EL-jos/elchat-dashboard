@@ -57,6 +57,7 @@ import { SiteSettingsComponent } from './pages/site/site-settings/site-settings.
 import { SiteConversationsComponent } from './pages/site/site-conversations/site-conversations.component';
 import { SiteUsersComponent } from './pages/site/site-users/site-users.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MessageService } from 'primeng/api';
 
 
 registerLocaleData(localeFr, 'fr');
@@ -129,7 +130,8 @@ registerLocaleData(localeFr, 'fr');
       useClass: JwtInterceptor,
       multi: true // ⚠️ OBLIGATOIRE
     },
-    NumberShortPipe
+    NumberShortPipe,
+    MessageService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   bootstrap: [AppComponent]

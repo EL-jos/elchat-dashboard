@@ -158,4 +158,42 @@ export class SiteService {
       )
       .pipe(map(res => WidgetSetting.fromJson(res.data)));
   }
+
+  uploadSitemap(
+    siteId: string,
+    file: File,
+    includePages: string[],
+    excludePages: string[]
+  ): Observable<any> {
+
+    const formData = new FormData();
+    formData.append('sitemap_file', file);
+
+    includePages.forEach(p =>
+      formData.append('include_pages[]', p)
+    );
+
+    excludePages.forEach(p =>
+      formData.append('exclude_pages[]', p)
+    );
+
+    return this.http.post(
+      `${this.api}/site/${siteId}/sitemap`,
+      formData
+    );
+  }
+
+  // ==================================================
+  // ⚙️ Actions
+  // ==================================================
+  /**
+   * Lance la génération du sitemap pour un site donné
+   */
+  generateSitemap(siteId: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${this.api}/site/sitemap`,
+      { site_id: siteId } // ✅ clé obligatoire pour Laravel
+    );
+  }
+
 }
