@@ -108,49 +108,58 @@
 <mat-card class="mt-4 el-card-upload-file">
     <mat-card-title>Importer un fichier</mat-card-title>
 
-    <!-- <p-fileUpload name="file" mode="advanced" accept=".csv,.pdf,.doc,.docx,.txt" chooseLabel="Choisir un fichier"
-        uploadLabel="Uploader" cancelLabel="Annuler">
-    </p-fileUpload> -->
-
     <p-fileUpload name="file" mode="advanced" accept=".csv,.xlsx,.xls" chooseLabel="Choisir un fichier"
         uploadLabel="Uploader" cancelLabel="Annuler" [customUpload]="true" (onSelect)="onProductFileSelect($event)">
     </p-fileUpload>
+
+    <div class="mt-2">
+        <button mat-stroked-button color="primary" (click)="downloadTemplate('csv')">
+            Télécharger le modèle CSV
+        </button>
+        <button mat-stroked-button color="primary" class="ml-2" (click)="downloadTemplate('xlsx')">
+            Télécharger le modèle Excel
+        </button>
+    </div>
+
     
     <!-- 👇 AJOUTER À PARTIR D’ICI -->
     <div *ngIf="showMapping" class="mapping-zone">
     
-        <h3>Correspondance des colonnes</h3>
+        <div class="mapping-group" *ngFor="let group of standardColumnGroups">
+            <h3>{{ group.label }}</h3>
     
-        <div class="mapping-row" *ngFor="let col of standardColumns">
-            <div class="left">
-                <strong>{{ col.label }}</strong>
-                <span *ngIf="col.required" class="required">*</span>
+            <div class="mapping-grid">
+                <div class="mapping-row" *ngFor="let col of group.columns">
+                    <div class="left">
+                        {{ col.label }}
+                        <span *ngIf="col.required" class="required">*</span>
+                    </div>
+    
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-select [(ngModel)]="mapping[col.key]" (selectionChange)="onMappingChange()">
+                            <mat-option [value]="null">
+                                — Non mappé —
+                            </mat-option>
+    
+                            <mat-option *ngFor="let fileCol of fileColumns" [value]="fileCol"
+                                [disabled]="isColumnAlreadyUsed(fileCol, col.key)">
+                                {{ fileCol }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
             </div>
-    
-            <div class="right">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-select placeholder="Choisir une colonne" [(ngModel)]="mapping[col.key]" [name]="'map_' + col.key"
-                        (selectionChange)="onMappingChange()">
-    
-                        <mat-option [value]="null">
-                            — Ne pas importer —
-                        </mat-option>
-    
-                        <mat-option *ngFor="let fileCol of availableFileColumns(col.key)" [value]="fileCol">
-                            {{ fileCol }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-        </div>
-    
-        <div class="mapping-actions">
-            <button mat-raised-button color="primary" [disabled]="!isMappingValid">
-                Uploader le fichier
-            </button>
         </div>
     
     </div>
+
+    <!-- Bouton upload visible uniquement si le mapping est valide -->
+    <div *ngIf="isMappingValid" class="mt-2">
+        <button pButton type="button" label="Uploader les produits" icon="pi pi-upload"
+            class="p-button-raised p-button-success" (click)="uploadProducts()">
+        </button>
+    </div>
+
 
     <!-- ===============================
      👁️ Aperçu des données

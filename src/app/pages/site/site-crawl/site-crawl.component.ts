@@ -27,16 +27,76 @@ export class SiteCrawlComponent {
   fileColumns: string[] = [];
   showMapping = false;
 
-  standardColumns = [
-    { key: 'product_name', label: 'Nom du produit', required: true },
-    { key: 'description', label: 'Description', required: false },
-    { key: 'price', label: 'Prix', required: false },
-    { key: 'currency', label: 'Devise', required: false },
-    { key: 'sku', label: 'SKU', required: false },
-    { key: 'brand', label: 'Marque', required: false },
-    { key: 'category', label: 'Catégorie', required: false },
-    { key: 'image_url', label: 'Image URL', required: false },
+  standardColumnGroups = [
+    {
+      key: 'core',
+      label: '🧩 Informations produit (CORE)',
+      columns: [
+        { key: 'product_name', label: 'Nom du produit', required: true },
+        { key: 'product_reference', label: 'Référence (SKU)' },
+        { key: 'product_type', label: 'Type de produit' },
+        { key: 'product_category', label: 'Catégorie' },
+        { key: 'description', label: 'Description' }
+      ]
+    },
+    {
+      key: 'pricing',
+      label: '💰 Prix & commercial',
+      columns: [
+        { key: 'price', label: 'Prix' },
+        { key: 'currency', label: 'Devise' },
+        { key: 'price_min', label: 'Prix min' },
+        { key: 'price_max', label: 'Prix max' },
+        { key: 'discount_price', label: 'Prix promo' },
+        { key: 'tax_rate', label: 'TVA' }
+      ]
+    },
+    {
+      key: 'descriptive',
+      label: '🧾 Descriptions & SEO',
+      columns: [
+        { key: 'short_description', label: 'Description courte' },
+        { key: 'features', label: 'Caractéristiques' },
+        { key: 'brand', label: 'Marque' },
+        { key: 'tags', label: 'Tags' },
+        { key: 'keywords', label: 'Mots-clés' }
+      ]
+    },
+    {
+      key: 'logistics',
+      label: '📦 Logistique',
+      columns: [
+        { key: 'stock_status', label: 'Statut stock' },
+        { key: 'stock_quantity', label: 'Quantité stock' },
+        { key: 'weight', label: 'Poids' },
+        { key: 'dimensions', label: 'Dimensions' },
+        { key: 'colors', label: 'Couleurs' },
+        { key: 'materials', label: 'Matières' },
+        { key: 'availability', label: 'Disponibilité' }
+      ]
+    },
+    {
+      key: 'media',
+      label: '🖼 Médias',
+      columns: [
+        { key: 'image_url', label: 'Image principale' },
+        { key: 'product_url', label: 'Url'},
+        { key: 'gallery_urls', label: 'Galerie images' },
+        { key: 'video_url', label: 'Vidéo' }
+      ]
+    },
+    {
+      key: 'meta',
+      label: '🔧 Métadonnées',
+      columns: [
+        { key: 'status', label: 'Statut' },
+        { key: 'language', label: 'Langue' },
+        { key: 'visibility', label: 'Visibilité' },
+        { key: 'created_at', label: 'Date création' }
+      ]
+    }
   ];
+
 
   mapping: Record<string, string | null> = {};
   isMappingValid = false;
@@ -141,6 +201,12 @@ export class SiteCrawlComponent {
 
   onProductFileSelect(event: any) {
     this.productFile = event.files?.[0] ?? null;
+    this.mapping = {};
+    this.fileColumns = [];
+    this.previewRows = [];
+    this.showMapping = false;
+    this.isMappingValid = false;
+
     if (!this.productFile) return;
 
     const extension = this.productFile.name.split('.').pop()?.toLowerCase();
@@ -194,31 +260,97 @@ export class SiteCrawlComponent {
     const normalize = (v: string) =>
       v.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-    this.standardColumns.forEach(col => {
-      const match = this.fileColumns.find(fc =>
-        normalize(fc).includes(normalize(col.key)) ||
-        normalize(fc).includes(normalize(col.label))
-      );
+    this.standardColumnGroups.forEach(group => {
+      group.columns.forEach(col => {
+        const match = this.fileColumns.find(fc =>
+          normalize(fc).includes(normalize(col.key)) ||
+          normalize(fc).includes(normalize(col.label))
+        );
 
-      this.mapping[col.key] = match ?? null;
+        this.mapping[col.key] = match ?? null;
+      });
     });
 
     this.onMappingChange();
   }
 
-  availableFileColumns(currentKey: string): string[] {
-    const usedColumns = Object.entries(this.mapping)
-      .filter(([key, val]) => key !== currentKey)
-      .map(([_, val]) => val)
-      .filter(Boolean);
-
-    return this.fileColumns.filter(col => !usedColumns.includes(col));
-  }
-
   onMappingChange() {
-    this.isMappingValid = this.standardColumns
-      .filter(c => c.required)
-      .every(c => !!this.mapping[c.key]);
+    const requiredColumns = this.standardColumnGroups
+      .flatMap(g => g.columns)
+      .filter(c => c.required);
+
+    this.isMappingValid = requiredColumns.every(
+      c => !!this.mapping[c.key]
+    );
   }
+
+  isColumnAlreadyUsed(fileColumn: string, currentKey: string): boolean {
+    return Object.entries(this.mapping)
+      .some(([key, value]) => key !== currentKey && value === fileColumn);
+  }
+
+  downloadTemplate(format: 'csv' | 'xlsx' = 'csv') {
+    const columns: string[] = this.standardColumnGroups
+      .flatMap(group => group.columns.map(col => col.key));
+
+    if (format === 'csv') {
+      const csvContent = columns.join(',') + '\n';
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'template-produits.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    } else {
+      // XLSX
+      const ws = XLSX.utils.aoa_to_sheet([columns]);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Produits');
+      XLSX.writeFile(wb, 'template-produits.xlsx');
+    }
+  }
+
+
+  getNormalizedRows(): any[] {
+    if (!this.productFile || !this.previewRows.length) return [];
+
+    return this.previewRows.map(row => {
+      const normalized: any = {};
+      Object.entries(this.mapping).forEach(([key, fileCol]) => {
+        normalized[key] = fileCol ? row[fileCol] ?? '' : '';
+      });
+      return normalized;
+    });
+  }
+
+  uploadProducts() {
+    if (!this.productFile) return;
+
+    // Validation métier avant upload
+    const normalizedRows = this.getNormalizedRows();
+    const invalidRows = normalizedRows.filter(row => !row.product_name);
+    if (invalidRows.length > 0) {
+      this.snackBar.open(`Erreur : certaines lignes n'ont pas de nom de produit.`, 'Fermer', { duration: 5000, panelClass: ['snackbar-error'] });
+      return;
+    }
+
+    // Préparer FormData
+    const formData = new FormData();
+    formData.append('file', this.productFile);
+    formData.append('mapping', JSON.stringify(this.mapping));
+
+    this.siteService.uploadDocument(this.overview.site.id, formData)
+      .subscribe({
+        next: doc => {
+          this.snackBar.open(`✅ Fichier importé avec succès`, 'Fermer', { duration: 3000, panelClass: ['snackbar-success'] });
+        },
+        error: err => {
+          this.snackBar.open(`❌ Erreur lors de l'import`, 'Fermer', { duration: 5000, panelClass: ['snackbar-error'] });
+          console.error(err);
+        }
+      });
+  }
+
 
 }
