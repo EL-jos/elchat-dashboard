@@ -1,7 +1,11 @@
+import { AiRole } from "../ai-role/ai-role";
+
 export class WidgetSetting {
+    public ai_role: AiRole | null = null;
     constructor(
         public id: string | null = null,
         public site_id: string | null = null,
+        public ai_role_id: string | null = null,
 
         // 🟣 Button
         public button_text: string | null = null,
@@ -40,6 +44,10 @@ export class WidgetSetting {
     ) { }
 
     static fromJson(json: any): WidgetSetting {
-        return Object.assign(new WidgetSetting(), json);
+        const settings = Object.assign(new WidgetSetting(), json);
+        if (json.ai_role) {
+            settings.ai_role = AiRole.fromJson(json.ai_role);
+        }
+        return settings;
     }
 }

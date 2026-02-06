@@ -1,3 +1,4 @@
+import { KnowledgeQualityScore } from "../knowledge-quality-score/knowledge-quality-score";
 import { User } from "../user/user";
 import { WidgetSetting } from "../widget-setting/widget-setting";
 
@@ -46,5 +47,6 @@ export interface SiteOverviewResponse {
     system_prompt: string;
     updated_at: string;
   };
-  settings: WidgetSetting
+  settings: WidgetSetting,
+  knowledge_quality_socre: KnowledgeQualityScore
 }

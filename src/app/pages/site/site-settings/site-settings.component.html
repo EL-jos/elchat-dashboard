@@ -244,7 +244,7 @@
                             <div class="el-col">
                                 <mat-form-field class="example-full-width">
                                     <mat-label>AI temperature</mat-label>
-                                    <input type="text" matInput [(ngModel)]="widgetSetting.ai_temperature"
+                                    <input type="number" matInput [(ngModel)]="widgetSetting.ai_temperature"
                                         name="ai_temperature" value="0.70" placeholder="70" />
                                 </mat-form-field>
                             </div>
@@ -263,6 +263,18 @@
                                     <input type="number" matInput [(ngModel)]="widgetSetting.min_similarity_score"
                                         name="min_similarity_score" value="0.30" placeholder="30" />
                                 </mat-form-field>
+                            </div>
+                            <div class="el-col">
+                                <div class="el-col">
+                                    <mat-form-field>
+                                        <mat-label>Role IA</mat-label>
+                                        <mat-select [(ngModel)]="widgetSetting.ai_role_id" name="ai_role">
+                                            <mat-option *ngFor="let role of ai_roles" [value]="role.id">
+                                                {{role.name}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
                             </div>
                         </div>
                         <div class="el-row">

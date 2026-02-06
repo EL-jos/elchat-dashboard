@@ -7,6 +7,7 @@ import { SiteService } from '../../services/site/site.service';
 import { User } from '../user/user';
 import { Account } from '../account/account';
 import { WidgetSetting } from '../widget-setting/widget-setting';
+import { KnowledgeQualityScore } from '../knowledge-quality-score/knowledge-quality-score';
 
 export class Site {
     public type: TypeSite | null = null;
@@ -15,6 +16,7 @@ export class Site {
     public conversations: Conversation[] = [];
     public documents: Document[] = [];
     public widgetSetting: WidgetSetting | null = null;
+    public knowledgeQualityScore: KnowledgeQualityScore | null = null;
 
     // 👥 visiteurs (lazy)
     public users: User[] = [];
@@ -82,6 +84,10 @@ export class Site {
 
         if (json.widgetSetting) {
             site.widgetSetting = WidgetSetting.fromJson(json.widgetSetting)
+        }
+
+        if (json.knowledgeQualityScore) {
+            site.knowledgeQualityScore = KnowledgeQualityScore.fromJson(json.knowledgeQualityScore)
         }
 
         return site;

@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { SiteService } from 'src/app/services/site/site.service';
-import { MessageService } from 'primeng/api';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SiteOverviewResponse } from 'src/app/models/site/site-overview-response';
 import * as Papa from 'papaparse';
 import * as XLSX from 'xlsx';
+
+type SourceType = 'crawl' | 'file' | 'manual';
 
 @Component({
   selector: 'app-site-crawl',
@@ -80,7 +81,7 @@ export class SiteCrawlComponent {
       label: '🖼 Médias',
       columns: [
         { key: 'image_url', label: 'Image principale' },
-        { key: 'product_url', label: 'Url'},
+        { key: 'product_url', label: 'Url' },
         { key: 'gallery_urls', label: 'Galerie images' },
         { key: 'video_url', label: 'Vidéo' }
       ]
@@ -107,18 +108,17 @@ export class SiteCrawlComponent {
   previewRows: any[] = [];
   maxPreviewRows = 5;
 
+  activeSource: SourceType | null = null;
 
 
   constructor(
     private siteService: SiteService,
     private snackBar: MatSnackBar
   ) { }
-
   onFileSelect(event: any) {
     this.sitemapFile = event.files?.[0] ?? null;
   }
-
-  onSubmit(form: NgForm) {
+  onCrawlSubmit(form: NgForm) {
 
     if (form.invalid || this.loading) return;
 
@@ -189,7 +189,6 @@ export class SiteCrawlComponent {
       complete: () => this.loading = false
     });
   }
-
   private parseLines(value?: string | string[]): string[] {
     if (!value) return [];
     if (Array.isArray(value)) return value.filter(Boolean); // déjà un tableau → juste filtrer les valeurs vides
@@ -198,7 +197,6 @@ export class SiteCrawlComponent {
       .map(v => v.trim())
       .filter(Boolean);
   }
-
   onProductFileSelect(event: any) {
     this.productFile = event.files?.[0] ?? null;
     this.mapping = {};
@@ -213,12 +211,18 @@ export class SiteCrawlComponent {
 
     if (extension === 'csv') {
       this.parseCsv(this.productFile);
-    } else if (['xlsx', 'xls'].includes(extension!)) {
-      this.parseExcel(this.productFile);
+    } else if (['xlsx', 'xls', 'doc', 'docx', 'txt', 'pdf'].includes(extension!)) {
+      if (['xlsx', 'xls'].includes(extension!)) {
+        this.parseExcel(this.productFile);
+      } else {
+        // Word ou TXT → peut juste afficher le nom, pas de parsing
+        this.previewRows = [];
+        this.fileColumns = [];
+        this.showMapping = false;
+      }
     } else {
-      this.snackBar.open('Format de fichier non supporté.', 'Fermer', {
-        duration: 3000
-      });
+      this.snackBar.open('Format de fichier non supporté.', 'Fermer', { duration: 3000 });
+      this.productFile = null;
     }
   }
 
@@ -234,7 +238,6 @@ export class SiteCrawlComponent {
       }
     });
   }
-
   private parseExcel(file: File) {
     const reader = new FileReader();
 
@@ -253,7 +256,6 @@ export class SiteCrawlComponent {
 
     reader.readAsBinaryString(file);
   }
-
   private initAutoMapping() {
     this.mapping = {};
 
@@ -273,7 +275,6 @@ export class SiteCrawlComponent {
 
     this.onMappingChange();
   }
-
   onMappingChange() {
     const requiredColumns = this.standardColumnGroups
       .flatMap(g => g.columns)
@@ -283,12 +284,10 @@ export class SiteCrawlComponent {
       c => !!this.mapping[c.key]
     );
   }
-
   isColumnAlreadyUsed(fileColumn: string, currentKey: string): boolean {
     return Object.entries(this.mapping)
       .some(([key, value]) => key !== currentKey && value === fileColumn);
   }
-
   downloadTemplate(format: 'csv' | 'xlsx' = 'csv') {
     const columns: string[] = this.standardColumnGroups
       .flatMap(group => group.columns.map(col => col.key));
@@ -310,8 +309,6 @@ export class SiteCrawlComponent {
       XLSX.writeFile(wb, 'template-produits.xlsx');
     }
   }
-
-
   getNormalizedRows(): any[] {
     if (!this.productFile || !this.previewRows.length) return [];
 
@@ -323,7 +320,6 @@ export class SiteCrawlComponent {
       return normalized;
     });
   }
-
   uploadProducts() {
     if (!this.productFile) return;
 
@@ -350,6 +346,91 @@ export class SiteCrawlComponent {
           console.error(err);
         }
       });
+  }
+  onTextManuelSubmit(textManuelForm: NgForm) {
+
+    if (textManuelForm.invalid || this.loading) return;
+
+    this.loading = true;
+
+    const payload = {
+      title: textManuelForm.value.title,
+      content: textManuelForm.value.content,
+    };
+
+    this.siteService
+      .submitManualContent(this.overview.site.id, payload)
+      .subscribe({
+        next: () => {
+          this.snackBar.open(
+            'Le contenu manuel a été ajouté et indexé avec succès.',
+            'Fermer',
+            {
+              duration: 3000,
+              panelClass: ['snackbar-success'],
+              horizontalPosition: 'right',
+              verticalPosition: 'bottom',
+            }
+          );
+
+          textManuelForm.resetForm();
+        },
+        error: (err: any) => {
+          const message =
+            err?.error?.message ??
+            'Erreur lors de l’envoi du contenu manuel.';
+
+          this.snackBar.open(message, 'Fermer', {
+            duration: 4000,
+            panelClass: ['snackbar-error'],
+            horizontalPosition: 'right',
+            verticalPosition: 'bottom',
+          });
+        },
+        complete: () => {
+          this.loading = false;
+        },
+      });
+  }
+
+  selectSource(source: SourceType) {
+    this.activeSource = source;
+    this.scrollToBottom();
+  }
+
+  scrollToBottom() {
+    setTimeout(() => {
+      const chat = document.querySelector('.el-chat-messages');
+      if (chat) chat.scrollTop = chat.scrollHeight;
+    }, 100);
+  }
+
+  launchKnowledgeAnalysis(): void {
+    this.siteService
+      .calculateKnowledgeQuality(this.overview.site.id)
+      .subscribe({
+        next: res => {
+          this.snackBar.open(
+            'Analyse de la connaissance IA lancée',
+            'OK',
+            { duration: 4000 }
+          );
+        },
+        error: () => {
+          this.snackBar.open(
+            'Erreur lors du lancement de l’analyse',
+            'Fermer',
+            { duration: 4000 }
+          );
+        }
+      });
+  }
+
+  get showMappingForFile(): boolean {
+    if (!this.showMapping || !this.productFile) return false;
+
+    const ext = this.productFile.name.split('.').pop()?.toLowerCase();
+    return ['csv', 'xls', 'xlsx'].includes(ext!);
   }
 
 

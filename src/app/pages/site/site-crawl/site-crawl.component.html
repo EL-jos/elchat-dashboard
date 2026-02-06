@@ -1,8 +1,87 @@
 <!-- ===============================
+📊 Qualité IA
+================================ -->
+<mat-card class="mt-4 el-knowledge-quality-card" *ngIf="overview.knowledge_quality_socre; else noKnowledgeScore">
+
+    <!-- Progress Bar globale -->
+    <div class="el-score-global" [ngClass]="{
+        'kl-very-low': overview.knowledge_quality_socre.global_score <= 25,
+        'kl-low': overview.knowledge_quality_socre.global_score > 25 && overview.knowledge_quality_socre.global_score <= 50,
+        'kl-medium': overview.knowledge_quality_socre.global_score > 50 && overview.knowledge_quality_socre.global_score <= 70,
+        'kl-good': overview.knowledge_quality_socre.global_score > 70 && overview.knowledge_quality_socre.global_score <= 85,
+        'kl-excellent': overview.knowledge_quality_socre.global_score > 85
+      }">
+        <h2>{{ overview.knowledge_quality_socre.global_score | number:'1.0-0' }}%</h2>
+    </div>
+
+    <mat-card-title>Qualité de la connaissance IA</mat-card-title>
+    <button mat-raised-button color="primary" (click)="launchKnowledgeAnalysis()">
+        Lancer l’analyse de la connaissance IA
+    </button>
+
+    <!-- Détails par composant -->
+    <div class="scores-details">
+        <ul>
+            <li>
+                <h4>{{ overview.knowledge_quality_socre.coverage_score | number:'1.0-0' }}%</h4>
+                <strong>Couverture</strong>
+                <p class="explanation">
+                    La couverture mesure le pourcentage de chunks avec du contenu.
+                    Plus elle est élevée, plus l’IA a accès à des informations fiables et complètes pour répondre aux
+                    visiteurs.
+                </p>
+            </li>
+            <li>
+                <h4>{{ overview.knowledge_quality_socre.data_quality_score | number:'1.0-0' }}%</h4>
+                <strong>Données</strong>
+                <p class="explanation">
+                    La qualité des données indique la longueur et la précision du contenu.
+                    Des données détaillées permettent à l’IA de formuler des réponses plus complètes.
+                </p>
+            </li>
+            <li>
+                <h4>{{ overview.knowledge_quality_socre.semantic_score | number:'1.0-0' }}%</h4>
+                <strong>Richesse sémantique</strong>
+                <p class="explanation">
+                    Mesure la diversité du vocabulaire et des concepts.
+                    Plus le contenu est varié, plus l’IA peut comprendre et reformuler les questions.
+                </p>
+            </li>
+            <li>
+                <h4>{{ overview.knowledge_quality_socre.freshness_score | number:'1.0-0' }}%</h4>
+                <strong>Fraîcheur</strong>
+                <p class="explanation">
+                    Indique le pourcentage de contenu récent (30 derniers jours).
+                    Plus le contenu est récent, plus les réponses de l’IA seront à jour et pertinentes.
+                </p>
+            </li>
+        </ul>
+    </div>
+</mat-card>
+
+<ng-template #noKnowledgeScore>
+    <mat-card class="mt-4 el-knowledge-quality-card empty-state">
+        <mat-card-title>Qualité de la connaissance IA</mat-card-title>
+
+        <p class="empty-explanation">
+            Cette analyse permet d’évaluer la capacité de l’IA à répondre correctement
+            aux visiteurs de votre site.
+            <br /><br />
+            Sans score de connaissance, l’IA se base sur des données partielles,
+            ce qui peut entraîner des réponses imprécises ou incomplètes.
+        </p>
+
+        <button mat-raised-button color="primary" (click)="launchKnowledgeAnalysis()">
+            Lancer l’analyse de la connaissance IA
+        </button>
+    </mat-card>
+</ng-template>
+
+
+<!-- ===============================
  🧠 Sources de connaissance IA
 ================================ -->
-
-<mat-card class="mb-4 el-card-title">
+<mat-card class="mb-4 mt-4 el-card-title">
     <mat-card-title>Sources de connaissance</mat-card-title>
     <mat-card-subtitle>
         Gérez tout le contenu utilisé par votre assistant IA
@@ -12,24 +91,25 @@
 <!-- ===============================
  ➕ Ajouter une source
 ================================ -->
-
-<h3 class="mb-2 el-title-source">Ajouter une source</h3>
+<!-- <h3 class="mb-2 el-title-source">Ajouter une source</h3> -->
 <div class="el-container-sources">
     <div class="el-grid">
         <!-- 🌐 Crawl -->
-        <mat-card class="source-card clickable">
+        <mat-card class="source-card clickable" [class.active]="activeSource === 'crawl'"
+            (click)="selectSource('crawl')">
             <mat-icon>public</mat-icon>
             <h4>Site web (Crawl)</h4>
             <p>Analyse automatique de votre site</p>
         </mat-card>
         <!-- 📁 Upload -->
-        <mat-card class="source-card clickable">
+        <mat-card class="source-card clickable" [class.active]="activeSource === 'file'" (click)="selectSource('file')">
             <mat-icon>upload_file</mat-icon>
             <h4>Fichier</h4>
             <p>CSV, Word, PDF</p>
         </mat-card>
         <!-- ✍️ Texte -->
-        <mat-card class="source-card clickable">
+        <mat-card class="source-card clickable" [class.active]="activeSource === 'manual'"
+            (click)="selectSource('manual')">
             <mat-icon>edit</mat-icon>
             <h4>Texte manuel</h4>
             <p>Ajout direct de contenu</p>
@@ -40,11 +120,10 @@
 <!-- ===============================
  🌐 Crawl du site
 ================================ -->
-
-<mat-card class="mt-4 el-card-crawl" *ngIf="overview">
+<mat-card class="mt-4 el-card-crawl" *ngIf="activeSource === 'crawl' && overview">
     <mat-card-title>Crawl du site</mat-card-title>
 
-    <form #siteForm="ngForm" (ngSubmit)="onSubmit(siteForm)">
+    <form #siteForm="ngForm" (ngSubmit)="onCrawlSubmit(siteForm)">
 
         <div class="el-row">
             <div class="el-col">
@@ -57,7 +136,8 @@
             <div class="el-col">
                 <mat-form-field appearance="outline">
                     <mat-label>Crawl depth</mat-label>
-                    <input matInput type="number" name="crawl_depth" [(ngModel)]="overview.settings_crawl.crawl_depth" min="1" max="5" required value="1">
+                    <input matInput type="number" name="crawl_depth" [(ngModel)]="overview.settings_crawl.crawl_depth"
+                        min="1" max="5" required value="1">
                 </mat-form-field>
             </div>
         </div>
@@ -99,20 +179,14 @@
 
     </form>
 </mat-card>
-
-
 <!-- ===============================
  📁 Upload de fichiers
 ================================ -->
-
-<mat-card class="mt-4 el-card-upload-file">
+<mat-card class="mt-4 el-card-upload-file" *ngIf="activeSource === 'file'">
     <mat-card-title>Importer un fichier</mat-card-title>
 
-    <p-fileUpload name="file" mode="advanced" accept=".csv,.xlsx,.xls" chooseLabel="Choisir un fichier"
-        uploadLabel="Uploader" cancelLabel="Annuler" [customUpload]="true" (onSelect)="onProductFileSelect($event)">
-    </p-fileUpload>
 
-    <div class="mt-2">
+    <div class="mt-2" *ngIf="showMappingForFile">
         <button mat-stroked-button color="primary" (click)="downloadTemplate('csv')">
             Télécharger le modèle CSV
         </button>
@@ -121,26 +195,40 @@
         </button>
     </div>
 
-    
+    <div class="file-upload-wrapper">
+        <p-fileUpload name="file" mode="basic" chooseLabel="Choisir un fichier" [customUpload]="true"
+            (onSelect)="onProductFileSelect($event)">
+        </p-fileUpload>
+
+        <span class="file-name" *ngIf="productFile">
+            {{ productFile.name }}
+        </span>
+        <!-- Bouton Upload -->
+        <button mat-raised-button color="primary" [disabled]="!productFile" (click)="uploadProducts()">
+            Uploader
+        </button>
+    </div>
+
+
     <!-- 👇 AJOUTER À PARTIR D’ICI -->
-    <div *ngIf="showMapping" class="mapping-zone">
-    
+    <div *ngIf="showMappingForFile" class="mapping-zone">
+
         <div class="mapping-group" *ngFor="let group of standardColumnGroups">
             <h3>{{ group.label }}</h3>
-    
+
             <div class="mapping-grid">
                 <div class="mapping-row" *ngFor="let col of group.columns">
                     <div class="left">
                         {{ col.label }}
                         <span *ngIf="col.required" class="required">*</span>
                     </div>
-    
+
                     <mat-form-field appearance="outline" class="full-width">
                         <mat-select [(ngModel)]="mapping[col.key]" (selectionChange)="onMappingChange()">
                             <mat-option [value]="null">
                                 — Non mappé —
                             </mat-option>
-    
+
                             <mat-option *ngFor="let fileCol of fileColumns" [value]="fileCol"
                                 [disabled]="isColumnAlreadyUsed(fileCol, col.key)">
                                 {{ fileCol }}
@@ -150,7 +238,7 @@
                 </div>
             </div>
         </div>
-    
+
     </div>
 
     <!-- Bouton upload visible uniquement si le mapping est valide -->
@@ -165,9 +253,9 @@
      👁️ Aperçu des données
     ================================ -->
     <div *ngIf="previewRows.length" class="preview-zone">
-    
+
         <h3>Aperçu des données ({{ previewRows.length }} lignes)</h3>
-    
+
         <div class="preview-table">
             <table>
                 <thead>
@@ -184,73 +272,33 @@
                 </tbody>
             </table>
         </div>
-    
+
     </div>
 
 </mat-card>
-
 <!-- ===============================
  ✍️ Texte manuel
 ================================ -->
-
-<mat-card class="mt-4">
+<mat-card class="mt-4 el-card-text-manuel" *ngIf="activeSource === 'manual'">
     <mat-card-title>Texte manuel</mat-card-title>
 
-    <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Titre</mat-label>
-        <input matInput placeholder="Ex: Nos coordonnées">
-    </mat-form-field>
+    <form #textManuelForm="ngForm" (ngSubmit)="onTextManuelSubmit(textManuelForm)">
 
-    <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Contenu</mat-label>
-        <textarea matInput rows="4" placeholder="Ex: Contactez-nous à info@domaine.com">
-    </textarea>
-    </mat-form-field>
+        <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Titre</mat-label>
+            <input matInput name="title" ngModel required maxlength="255" placeholder="Ex: Nos coordonnées">
+        </mat-form-field>
 
-    <button mat-raised-button color="primary">
-        Ajouter à la base IA
-    </button>
-</mat-card>
+        <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Contenu</mat-label>
+            <textarea matInput name="content" ngModel required minlength="20" rows="4"
+                placeholder="Ex: Contactez-nous à info@domaine.com">
+            </textarea>
+        </mat-form-field>
 
-<!-- ===============================
- 📚 Sources actives
-================================ -->
+        <button mat-raised-button color="primary" type="submit" [disabled]="textManuelForm.invalid || loading">
+            Ajouter à la base IA
+        </button>
 
-<mat-card class="mt-4">
-    <mat-card-title>Sources actives</mat-card-title>
-
-    <p-table [value]="[]">
-        <ng-template pTemplate="header">
-            <tr>
-                <th>Nom</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </ng-template>
-
-        <ng-template pTemplate="body" let-source>
-            <tr>
-                <td>{{ source.name }}</td>
-                <td>{{ source.type }}</td>
-                <td>
-                    <p-tag severity="success" value="Actif"></p-tag>
-                </td>
-                <td>
-                    <button pButton icon="pi pi-trash" class="p-button-text"></button>
-                </td>
-            </tr>
-        </ng-template>
-    </p-table>
-</mat-card>
-
-<!-- ===============================
- 📊 Qualité IA
-================================ -->
-
-<mat-card class="mt-4">
-    <mat-card-title>Qualité de la connaissance</mat-card-title>
-
-    <p-progressBar [value]="75"></p-progressBar>
-    <small>Couverture estimée : bonne</small>
+    </form>
 </mat-card>

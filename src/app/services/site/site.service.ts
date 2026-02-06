@@ -196,4 +196,42 @@ export class SiteService {
     );
   }
 
+  // ==================================================
+  // ✍️ Contenu manuel
+  // ==================================================
+
+  submitManualContent(
+    siteId: string,
+    payload: { title: string; content: string }
+  ): Observable<{ message: string; page_id: number }> {
+    return this.http.post<{ message: string; page_id: number }>(
+      `${this.api}/site/${siteId}/manual-content`,
+      payload
+    );
+  }
+
+  // ==================================================
+  // 🧠 IA – Knowledge Quality
+  // ==================================================
+
+  /**
+   * Lance le calcul de la qualité de la connaissance IA
+   * pour un site donné
+   */
+  calculateKnowledgeQuality(siteId: string): Observable<{
+    success: boolean;
+    message: string;
+  }> {
+    return this.http.post<{
+      success: boolean;
+      message: string;
+    }>(
+      `${this.api}/knowledge-quality/calculate`,
+      {
+        site_id: siteId
+      }
+    );
+  }
+
+
 }

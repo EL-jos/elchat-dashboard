@@ -6,6 +6,8 @@ import { NgForm } from '@angular/forms';
 import { WidgetSetting } from 'src/app/models/widget-setting/widget-setting';
 import { SiteService } from 'src/app/services/site/site.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AiRoleService } from 'src/app/services/ai-role/ai-role.service';
+import { AiRole } from 'src/app/models/ai-role/ai-role';
 
 @Component({
   selector: 'app-site-settings',
@@ -33,11 +35,13 @@ export class SiteSettingsComponent implements OnInit {
 
   button_position: string[] = ['bottom-right', 'bottom-left', 'top-right', 'top-left'];
   widgetSetting: WidgetSetting = new WidgetSetting();
+  ai_roles: AiRole[] = [];
 
   constructor(
     private http: HttpClient,
     private siteService: SiteService,
     private snackBar: MatSnackBar,
+    private aiRoleService: AiRoleService,
   ) { }
 
   ngOnInit(): void {
@@ -45,8 +49,12 @@ export class SiteSettingsComponent implements OnInit {
 
     if (!this.site?.id) return;
 
+    this.aiRoleService.getAiRoles().subscribe(ai_roles => {
+      this.ai_roles = ai_roles;
+    });
+
     this.siteService.getWidgetSettings(this.site.id).subscribe(setting => {
-      this.widgetSetting = setting;
+      this.widgetSetting = WidgetSetting.fromJson(setting);
     });
 
     this.rawSnippet = `
