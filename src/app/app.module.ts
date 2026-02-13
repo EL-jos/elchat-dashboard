@@ -58,6 +58,7 @@ import { SiteConversationsComponent } from './pages/site/site-conversations/site
 import { SiteUsersComponent } from './pages/site/site-users/site-users.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MessageService } from 'primeng/api';
+import { SiteProductsComponent } from './pages/site/site-products/site-products.component';
 
 
 registerLocaleData(localeFr, 'fr');
@@ -80,7 +81,8 @@ registerLocaleData(localeFr, 'fr');
     SiteCrawlComponent,
     SiteSettingsComponent,
     SiteConversationsComponent,
-    SiteUsersComponent
+    SiteUsersComponent,
+    SiteProductsComponent
   ],
   imports: [
     BrowserModule,

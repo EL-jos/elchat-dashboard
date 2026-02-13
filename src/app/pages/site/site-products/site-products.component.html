@@ -1,0 +1,32 @@
+<div class="products-tab">
+    <table mat-table [dataSource]="products" class="mat-elevation-z2" *ngIf="products.length">
+
+        <!-- Pour chaque colonne CORE / PRICING / ... -->
+        <ng-container *ngFor="let group of standardColumnGroups" [matColumnDef]="group.key">
+            <th mat-header-cell *matHeaderCellDef>{{ group.label }}</th>
+            <td mat-cell *matCellDef="let product">
+                <div *ngFor="let col of group.columns">
+                    <strong>{{ col.label }}:</strong> {{ product.getField(col.key) }}
+                </div>
+            </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let product">
+                <button mat-button color="primary" (click)="reindexProduct(product)">Re-indexer</button>
+                <button mat-button color="warn" (click)="deleteProduct(product)">Supprimer</button>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['core','pricing','descriptive','logistics','media','meta','actions']">
+        </tr>
+        <tr mat-row
+            *matRowDef="let row; columns: ['core','pricing','descriptive','logistics','media','meta','actions']"></tr>
+    </table>
+
+    <!-- Pagination -->
+    <mat-paginator [length]="pagination.total" [pageSize]="pagination.per_page"
+        (page)="changePage($event.pageIndex + 1)"></mat-paginator>
+</div>
