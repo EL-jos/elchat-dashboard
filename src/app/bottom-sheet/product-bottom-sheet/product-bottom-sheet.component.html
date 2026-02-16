@@ -1,0 +1,27 @@
+<mat-horizontal-stepper linear #stepper>
+  <ng-container *ngFor="let group of standardColumnGroups; let i = index">
+    <mat-step [stepControl]="stepForms[i]" [label]="group.label">
+      <form [formGroup]="stepForms[i]">
+
+        <div class="mapping-grid">
+          <div class="mapping-row" *ngFor="let col of group.columns">
+            <div class="left">
+              {{ col.label }}
+              <span *ngIf="col.required" class="required">*</span>
+            </div>
+            <div class="right">
+              <input matInput [formControlName]="col.key" [required]="!!col.required" />
+            </div>
+          </div>
+        </div>
+
+      </form>
+
+      <div class="step-actions">
+        <button mat-button matStepperPrevious *ngIf="i > 0">Précédent</button>
+        <button mat-button matStepperNext *ngIf="i < standardColumnGroups.length - 1">Suivant</button>
+        <button mat-button color="primary" (click)="save()" *ngIf="i === standardColumnGroups.length - 1">Re-indexer</button>
+      </div>
+    </mat-step>
+  </ng-container>
+</mat-horizontal-stepper>

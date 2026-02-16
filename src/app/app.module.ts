@@ -59,6 +59,8 @@ import { SiteUsersComponent } from './pages/site/site-users/site-users.component
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MessageService } from 'primeng/api';
 import { SiteProductsComponent } from './pages/site/site-products/site-products.component';
+import { MatSortModule } from '@angular/material/sort';
+import { ProductBottomSheetComponent } from './bottom-sheet/product-bottom-sheet/product-bottom-sheet.component';
 
 
 registerLocaleData(localeFr, 'fr');
@@ -82,7 +84,8 @@ registerLocaleData(localeFr, 'fr');
     SiteSettingsComponent,
     SiteConversationsComponent,
     SiteUsersComponent,
-    SiteProductsComponent
+    SiteProductsComponent,
+    ProductBottomSheetComponent
   ],
   imports: [
     BrowserModule,
@@ -120,7 +123,8 @@ registerLocaleData(localeFr, 'fr');
     TagModule,
     FileUploadModule,
     MatStepperModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatSortModule
   ],
   providers: [
     MatDatepickerModule,

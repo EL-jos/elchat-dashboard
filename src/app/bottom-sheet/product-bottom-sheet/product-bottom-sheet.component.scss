@@ -1,0 +1,21 @@
+.mapping-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 0.5rem;
+  margin-top: 1rem;
+
+  .mapping-row {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.step-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}

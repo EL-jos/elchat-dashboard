@@ -1,32 +1,150 @@
-<div class="products-tab">
-    <table mat-table [dataSource]="products" class="mat-elevation-z2" *ngIf="products.length">
 
-        <!-- Pour chaque colonne CORE / PRICING / ... -->
-        <ng-container *ngFor="let group of standardColumnGroups" [matColumnDef]="group.key">
-            <th mat-header-cell *matHeaderCellDef>{{ group.label }}</th>
-            <td mat-cell *matCellDef="let product">
-                <div *ngFor="let col of group.columns">
-                    <strong>{{ col.label }}:</strong> {{ product.getField(col.key) }}
-                </div>
+<div *ngIf="showReindexForm" class="reindex-form">
+  <h3>Modifier et re-indexer le produit "{{ currentProduct?.getField('product_name') }}"</h3>
+
+  <form (ngSubmit)="submitReindexForm()">
+
+    <div class="mapping-group" *ngFor="let group of standardColumnGroups">
+      <h4>{{ group.label }}</h4>
+      <div class="mapping-grid">
+        <div class="mapping-row" *ngFor="let col of group.columns">
+          <label>
+            {{ col.label }} 
+            <span *ngIf="col.required">*</span>
+          </label>
+          <input matInput [(ngModel)]="reindexForm[col.key]" name="{{col.key}}" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button mat-raised-button color="primary" type="submit">Re-indexer</button>
+      <button mat-raised-button type="button" color="warn" (click)="cancelReindex()">Annuler</button>
+    </div>
+  </form>
+</div>
+
+<div class="products-wrapper">
+
+    <!-- HEADER -->
+    <div class="table-header">
+
+        <div class="left">
+            <h2>Produits ({{ pagination.total }})</h2>
+        </div>
+
+        <div class="right">
+
+            <mat-form-field appearance="outline">
+                <mat-label>Recherche</mat-label>
+                <input matInput (keyup)="onSearch($event)" />
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" (click)="reindexSelected()"
+                [disabled]="!selection.selected.length">
+                Re-index sélection
+            </button>
+
+        </div>
+    </div>
+
+    <!-- LOADER -->
+    <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+
+    <!-- TABLE -->
+    <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)" *ngIf="!loading">
+
+        <!-- CHECKBOX -->
+        <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="toggleAllRows()" [checked]="isAllSelected()">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="selection.toggle(row)"
+                    [checked]="selection.isSelected(row)">
+                </mat-checkbox>
             </td>
         </ng-container>
 
-        <!-- Actions -->
+        <!-- NOM -->
+        <ng-container matColumnDef="product_name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
+            <td mat-cell *matCellDef="let el" class="name">
+                {{ getDisplayValue(el, 'product_name') }}
+            </td>
+        </ng-container>
+
+        <!-- REF -->
+        <ng-container matColumnDef="product_reference">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Référence</th>
+            <td mat-cell *matCellDef="let el">
+                {{ getDisplayValue(el, 'product_reference') }}
+            </td>
+        </ng-container>
+
+        <!-- CAT -->
+        <ng-container matColumnDef="product_category">
+            <th mat-header-cell *matHeaderCellDef>Catégorie</th>
+            <td mat-cell *matCellDef="let el">
+                <span class="category">
+                    {{ getDisplayValue(el, 'product_category') }}
+                </span>
+            </td>
+        </ng-container>
+
+        <!-- PRIX -->
+        <ng-container matColumnDef="price">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="right">
+                Prix
+            </th>
+            <td mat-cell *matCellDef="let el" class="right">
+                {{ getDisplayValue(el, 'price') }}
+            </td>
+        </ng-container>
+
+        <!-- PROMO -->
+        <ng-container matColumnDef="discount_price">
+            <th mat-header-cell *matHeaderCellDef class="right">
+                Promo
+            </th>
+            <td mat-cell *matCellDef="let el" class="right promo">
+                {{ getDisplayValue(el, 'discount_price') }}
+            </td>
+        </ng-container>
+
+        <!-- ACTIONS -->
         <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let product">
-                <button mat-button color="primary" (click)="reindexProduct(product)">Re-indexer</button>
-                <button mat-button color="warn" (click)="deleteProduct(product)">Supprimer</button>
+            <th mat-header-cell *matHeaderCellDef class="center">Actions</th>
+            <td mat-cell *matCellDef="let el" class="center">
+
+                <button mat-icon-button [matMenuTriggerFor]="menu">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+
+                <mat-menu #menu="matMenu">
+                    <button mat-menu-item (click)="openReindexForm(el)"> <mat-icon>refresh</mat-icon>
+                        Modifier/Re-indexer</button>
+                    <button mat-menu-item (click)="reindexProduct(el)">
+                        <mat-icon>refresh</mat-icon>
+                        Re-indexer
+                    </button>
+                    <button mat-menu-item (click)="deleteProduct(el)">
+                        <mat-icon color="warn">delete</mat-icon>
+                        Supprimer
+                    </button>
+                </mat-menu>
+
             </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="['core','pricing','descriptive','logistics','media','meta','actions']">
-        </tr>
-        <tr mat-row
-            *matRowDef="let row; columns: ['core','pricing','descriptive','logistics','media','meta','actions']"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="row"></tr>
     </table>
 
-    <!-- Pagination -->
-    <mat-paginator [length]="pagination.total" [pageSize]="pagination.per_page"
-        (page)="changePage($event.pageIndex + 1)"></mat-paginator>
+    <!-- PAGINATION -->
+    <mat-paginator [length]="pagination.total" [pageSize]="pagination.per_page" [pageSizeOptions]="pageSizeOptions"
+        (page)="onPageChange($event)">
+    </mat-paginator>
+
 </div>

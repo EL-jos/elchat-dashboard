@@ -8,13 +8,23 @@ import { environment } from 'src/environments/environment';
 export class ProductService {
 
   private api = `${environment.serveur.url}`;
-  
-    constructor(private http: HttpClient) { }
+
+  constructor(private http: HttpClient) { }
 
   // Récupère les produits d'un site avec pagination
-  getProducts(siteId: string, page: number = 1, perPage: number = 20): Observable<{ products: Product[], pagination: any }> {
+  getProducts(siteId: string, page: number = 1, perPage: number = 20, search?: string): Observable<{ products: Product[], pagination: any }> {
+
+    const params: any = {
+      page: page,
+      per_page: perPage
+    };
+
+    if (search && search.trim() !== '') {
+      params.search = search.trim();
+    }
+
     return this.http
-      .get<any>(`${this.api}/chunk/${siteId}/products?page=${page}&per_page=${perPage}`)
+      .get<any>(`${this.api}/chunk/${siteId}/products`, { params })
       .pipe(
         map(res => ({
           products: res.data.map((p: any) => Product.fromJson(p)),
@@ -38,5 +48,11 @@ export class ProductService {
   // Re-indexer un produit
   reindexProduct(siteId: string, documentId: string, productIndex: number): Observable<any> {
     return this.http.get<any>(`${this.api}/chunk/product/${siteId}/${documentId}/${productIndex}/reindex`);
+  }
+
+  updateAndReindexProduct(siteId: string, documentId: string, fields: Record<string, any>): Observable<any> {
+    console.log(fields);
+    debugger
+    return this.http.post(`${this.api}/sites/${siteId}/products/${documentId}/reindex`, { fields });
   }
 }
