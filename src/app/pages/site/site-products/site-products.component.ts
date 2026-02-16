@@ -55,10 +55,6 @@ export class SiteProductsComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  // Formulaire de re-index
-  showReindexForm = false;
-  currentProduct: Product | null = null;
-  reindexForm: Record<string, any> = {};
   standardColumnGroups = [
     {
       key: 'core',
@@ -251,39 +247,52 @@ export class SiteProductsComponent implements OnInit {
       : this.products.forEach(row => this.selection.select(row));
   }
 
-  openReindexForm(product: Product) {
-  const ref = this.bottomSheet.open(ProductBottomSheetComponent, {
-    data: { product, siteId: this.siteId, standardColumnGroups: this.standardColumnGroups },
-    hasBackdrop: true
-  });
+  openReindexForm(product: Product): void {
 
-  ref.afterDismissed().subscribe(result => {
-    if (result) {
-      this.loadProducts(this.pagination.current_page);
-    }
-  });
-}
+    const ref = this.bottomSheet.open(ProductBottomSheetComponent, {
+      data: {
+        product,
+        siteId: this.siteId,
+        standardColumnGroups: this.standardColumnGroups
+      },
+      hasBackdrop: true,
+      disableClose: true, // empêche fermeture accidentelle
+      panelClass: 'reindex-bottom-sheet'
+    });
 
-  submitReindexForm() {
-    if (!this.currentProduct) return;
+    ref.afterDismissed().subscribe((updatedFields: Record<string, any> | undefined) => {
 
-    // Mettre à jour le produit côté backend et re-index
-    this.productService.updateAndReindexProduct(this.siteId, this.currentProduct.document_id!, this.reindexForm)
-      .subscribe({
-        next: () => {
-          this.snackBar.open('Produit re-indexé avec succès.', 'Fermer', { duration: 3000 });
-          this.showReindexForm = false;
-          this.loadProducts(this.pagination.current_page);
-        },
-        error: () => {
-          this.snackBar.open('Erreur lors du re-index.', 'Fermer', { duration: 3000 });
-        }
-      });
+      if (!updatedFields) return;
+
+      this.loading = true;
+
+      this.productService
+        .updateAndReindexProduct(
+          this.siteId,
+          product.document_id!,
+          product.product_index!,
+          updatedFields
+        )
+        .subscribe({
+          next: () => {
+            this.snackBar.open(
+              'Produit mis à jour et re-indexé avec succès.',
+              'Fermer',
+              { duration: 3000 }
+            );
+            this.loadProducts(this.pagination.current_page);
+          },
+          error: () => {
+            this.snackBar.open(
+              'Erreur lors du re-index.',
+              'Fermer',
+              { duration: 3000 }
+            );
+            this.loading = false;
+          }
+        });
+
+    });
   }
 
-   cancelReindex() {
-    this.showReindexForm = false;
-    this.currentProduct = null;
-  }
-  
 }

@@ -12,42 +12,56 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class ProductBottomSheetComponent implements OnInit {
 
-  product: Product;
-  stepForms: FormGroup[] = [];  // un FormGroup par step
-  stepLabels: string[] = [];    // labels des steps
-  standardColumnGroups: any[];
+  product!: Product;
+  siteId!: string;
+  stepForms: FormGroup[] = [];
+  standardColumnGroups!: any[];
 
   constructor(
     private fb: FormBuilder,
     private bottomSheetRef: MatBottomSheetRef<ProductBottomSheetComponent>,
-    @Inject(MAT_BOTTOM_SHEET_DATA) public data: { product: Product, standardColumnGroups: any[] }
+    @Inject(MAT_BOTTOM_SHEET_DATA)
+    public data: {
+      product: Product;
+      siteId: string;
+      standardColumnGroups: any[];
+    }
   ) {
     this.product = data.product;
+    this.siteId = data.siteId;
     this.standardColumnGroups = data.standardColumnGroups;
+    console.log(this.product);
+    
   }
 
   ngOnInit(): void {
+
     this.standardColumnGroups.forEach(group => {
-      const controls: any = {};
+
+      const controls: Record<string, FormControl> = {};
+
       group.columns.forEach((col: any) => {
-        // Pré-remplit la valeur si elle existe sinon vide
-        controls[col.key] = new FormControl(this.product.getField(col.key) ?? '');
+        controls[col.key] = new FormControl(
+          this.product.getField(col.key) ?? ''
+        );
       });
+
       this.stepForms.push(this.fb.group(controls));
-      this.stepLabels.push(group.label);
     });
   }
 
-  save() {
-    // On récupère toutes les valeurs
-    const updatedFields: Record<string, any> = {};
-    this.stepForms.forEach(g => Object.assign(updatedFields, g.value));
+  save(): void {
 
-    // On renvoie les valeurs modifiées au composant parent
+    const updatedFields: Record<string, any> = {};
+
+    this.stepForms.forEach(formGroup => {
+      Object.assign(updatedFields, formGroup.value);
+    });
+
     this.bottomSheetRef.dismiss(updatedFields);
   }
 
-  close() {
+  close(): void {
     this.bottomSheetRef.dismiss();
   }
 }

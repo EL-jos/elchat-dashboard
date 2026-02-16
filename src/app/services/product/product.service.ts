@@ -50,9 +50,7 @@ export class ProductService {
     return this.http.get<any>(`${this.api}/chunk/product/${siteId}/${documentId}/${productIndex}/reindex`);
   }
 
-  updateAndReindexProduct(siteId: string, documentId: string, fields: Record<string, any>): Observable<any> {
-    console.log(fields);
-    debugger
-    return this.http.post(`${this.api}/sites/${siteId}/products/${documentId}/reindex`, { fields });
+  updateAndReindexProduct(siteId: string, documentId: string, productIndex: number, fields: Record<string, any>): Observable<any> {
+    return this.http.post(`${this.api}/chunk/product/${siteId}/${documentId}/${productIndex}/reindex`, { fields });
   }
 }
