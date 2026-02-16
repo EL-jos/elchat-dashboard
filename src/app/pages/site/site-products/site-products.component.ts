@@ -26,7 +26,7 @@ export class SiteProductsComponent implements OnInit {
   selection = new SelectionModel<Product>(true, []);
 
   displayedColumns: string[] = [
-    'select',
+    //'select',
     'product_name',
     'product_reference',
     'product_category',

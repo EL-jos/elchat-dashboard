@@ -14,10 +14,10 @@
                 <input matInput (keyup)="onSearch($event)" />
             </mat-form-field>
 
-            <button mat-raised-button color="primary" (click)="reindexSelected()"
+            <!-- <button mat-raised-button color="primary" (click)="reindexSelected()"
                 [disabled]="!selection.selected.length">
                 Re-index sélection
-            </button>
+            </button> -->
 
         </div>
     </div>
@@ -29,7 +29,7 @@
     <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)" *ngIf="!loading">
 
         <!-- CHECKBOX -->
-        <ng-container matColumnDef="select">
+        <!-- <ng-container matColumnDef="select">
             <th mat-header-cell *matHeaderCellDef>
                 <mat-checkbox (change)="toggleAllRows()" [checked]="isAllSelected()">
                 </mat-checkbox>
@@ -39,7 +39,7 @@
                     [checked]="selection.isSelected(row)">
                 </mat-checkbox>
             </td>
-        </ng-container>
+        </ng-container> -->
 
         <!-- NOM -->
         <ng-container matColumnDef="product_name">
