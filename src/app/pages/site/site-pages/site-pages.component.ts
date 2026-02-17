@@ -18,6 +18,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { PageImportBottomSheetComponent } from 'src/app/bottom-sheet/page-import-bottom-sheet/page-import-bottom-sheet.component';
+import { SelectionModel } from '@angular/cdk/collections';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from 'src/app/dialogs/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-site-pages',
@@ -69,12 +74,45 @@ export class SitePagesComponent implements OnInit, AfterViewInit {
 
 
   // --- Table ---
-  displayedColumns: string[] = ['icon', 'url', 'title', 'source', 'chunks_count', 'is_indexed', 'status', 'created_at', 'action'];
+  displayedColumns: string[] = ['select', 'icon', 'url', 'title', 'source', 'chunks_count', 'is_indexed', 'status', 'created_at', 'action'];
   dataSource = new MatTableDataSource<Page>(this.pages);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
+  standardContentColumns = [
+    {
+      key: 'core',
+      label: '🧩 Informations principales',
+      columns: [
+        { key: 'id', label: 'ID' },
+        { key: 'title', label: 'Titre', required: true },
+        { key: 'content', label: 'Contenu', required: true },
+        { key: 'excerpt', label: 'Résumé' },
+        { key: 'published_at', label: 'Date de publication' },
+        { key: 'slug', label: 'Slug' },
+        { key: 'url', label: 'URL' }
+      ]
+    },
+    {
+      key: 'taxonomy',
+      label: '🏷 Catégories & Tags',
+      columns: [
+        { key: 'categories', label: 'Catégories' },
+        { key: 'tags', label: 'Tags' }
+      ]
+    },
+    {
+      key: 'seo',
+      label: '🔎 SEO',
+      columns: [
+        { key: 'seo_keywords', label: 'SEO Keywords' },
+        { key: 'seo_description', label: 'SEO Description' }
+      ]
+    }
+  ];
 
-  constructor(private pageService: PageService) { }
+  selection = new SelectionModel<Page>(true, []);
+
+  constructor(private pageService: PageService, private bottomSheet: MatBottomSheet, private dialog: MatDialog) { }
 
   ngOnInit(): void {
     if (!this.siteId) {
@@ -134,6 +172,80 @@ export class SitePagesComponent implements OnInit, AfterViewInit {
   }
 
   onDeleteSite(page: Page) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Supprimer la page',
+        message: `Voulez-vous vraiment supprimer "${page.title}" ?`,
+        confirmText: 'Oui, supprimer'
+      }
+    });
 
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result) return;
+
+      this.pageService.deletePages([page.id]).subscribe(() => {
+        this.loadPages();
+        this.selection.clear();
+      });
+    });
   }
+
+  deleteSelected() {
+
+    const count = this.selection.selected.length;
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Suppression multiple',
+        message: `Voulez-vous vraiment supprimer ${count} page(s) ?`,
+        confirmText: 'Oui, supprimer tout'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result) return;
+
+      const ids = this.selection.selected.map(p => p.id);
+
+      this.pageService.deletePages(ids).subscribe(() => {
+        this.loadPages();
+        this.selection.clear();
+      });
+    });
+  }
+
+  openImportSheet(): void {
+
+    const ref = this.bottomSheet.open(PageImportBottomSheetComponent, {
+      data: {
+        siteId: this.siteId,
+        standardColumns: this.standardContentColumns
+      },
+      disableClose: true,
+      panelClass: 'import-bottom-sheet'
+    });
+
+    ref.afterDismissed().subscribe(result => {
+      if (result) {
+        this.loadPages();
+      }
+    });
+  }
+
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.length;
+    return numSelected === numRows;
+  }
+
+  toggleAllRows() {
+    if (this.isAllSelected()) {
+      this.selection.clear();
+    } else {
+      this.selection.select(...this.dataSource.data);
+    }
+  }
+
 }

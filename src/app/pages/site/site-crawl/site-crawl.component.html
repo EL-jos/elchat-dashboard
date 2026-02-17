@@ -5,12 +5,12 @@
 
     <!-- Progress Bar globale -->
     <div class="el-score-global" [ngClass]="{
-        'kl-very-low': overview.knowledge_quality_socre.global_score <= 25,
-        'kl-low': overview.knowledge_quality_socre.global_score > 25 && overview.knowledge_quality_socre.global_score <= 50,
-        'kl-medium': overview.knowledge_quality_socre.global_score > 50 && overview.knowledge_quality_socre.global_score <= 70,
-        'kl-good': overview.knowledge_quality_socre.global_score > 70 && overview.knowledge_quality_socre.global_score <= 85,
-        'kl-excellent': overview.knowledge_quality_socre.global_score > 85
-      }">
+      'kl-very-low': overview.knowledge_quality_socre.global_score <= 25,
+      'kl-low': overview.knowledge_quality_socre.global_score > 25 && overview.knowledge_quality_socre.global_score <= 50,
+      'kl-medium': overview.knowledge_quality_socre.global_score > 50 && overview.knowledge_quality_socre.global_score <= 70,
+      'kl-good': overview.knowledge_quality_socre.global_score > 70 && overview.knowledge_quality_socre.global_score <= 85,
+      'kl-excellent': overview.knowledge_quality_socre.global_score > 85
+    }">
         <h2>{{ overview.knowledge_quality_socre.global_score | number:'1.0-0' }}%</h2>
     </div>
 
@@ -26,36 +26,56 @@
                 <h4>{{ overview.knowledge_quality_socre.coverage_score | number:'1.0-0' }}%</h4>
                 <strong>Couverture</strong>
                 <p class="explanation">
-                    La couverture mesure le pourcentage de chunks avec du contenu.
-                    Plus elle est élevée, plus l’IA a accès à des informations fiables et complètes pour répondre aux
-                    visiteurs.
+                    Pourcentage de contenu exploitable. Plus il est élevé, plus l’IA a accès à des informations
+                    complètes.
                 </p>
             </li>
             <li>
-                <h4>{{ overview.knowledge_quality_socre.data_quality_score | number:'1.0-0' }}%</h4>
-                <strong>Données</strong>
+                <h4>{{ overview.knowledge_quality_socre.integrity_score | number:'1.0-0' }}%</h4>
+                <strong>Intégrité</strong>
                 <p class="explanation">
-                    La qualité des données indique la longueur et la précision du contenu.
-                    Des données détaillées permettent à l’IA de formuler des réponses plus complètes.
+                    Mesure la qualité et la précision du contenu. Contenu trop court ou vide diminue ce score.
                 </p>
             </li>
             <li>
-                <h4>{{ overview.knowledge_quality_socre.semantic_score | number:'1.0-0' }}%</h4>
-                <strong>Richesse sémantique</strong>
+                <h4>{{ overview.knowledge_quality_socre.retrieval_score | number:'1.0-0' }}%</h4>
+                <strong>Structuration / Retrieval</strong>
                 <p class="explanation">
-                    Mesure la diversité du vocabulaire et des concepts.
-                    Plus le contenu est varié, plus l’IA peut comprendre et reformuler les questions.
+                    Évalue la longueur optimale des chunks et la densité lexicale pour un accès rapide et pertinent par
+                    l’IA.
+                </p>
+            </li>
+            <li>
+                <h4>{{ overview.knowledge_quality_socre.redundancy_score | number:'1.0-0' }}%</h4>
+                <strong>Redondance</strong>
+                <p class="explanation">
+                    Score anti-duplication : moins le contenu est dupliqué, plus l’IA est efficace et pertinente.
                 </p>
             </li>
             <li>
                 <h4>{{ overview.knowledge_quality_socre.freshness_score | number:'1.0-0' }}%</h4>
                 <strong>Fraîcheur</strong>
                 <p class="explanation">
-                    Indique le pourcentage de contenu récent (30 derniers jours).
-                    Plus le contenu est récent, plus les réponses de l’IA seront à jour et pertinentes.
+                    Pourcentage de contenu récent. Plus le contenu est à jour, plus les réponses de l’IA sont
+                    pertinentes.
+                </p>
+            </li>
+            <li>
+                <h4>{{ overview.knowledge_quality_socre.precision | number:'1.0-0' }}%</h4>
+                <strong>Précision</strong>
+                <p class="explanation">
+                    Pourcentage de contenu pertinent pour l’IA. Plus le contenu est pertinent, plus les réponses sont
+                    précises.
                 </p>
             </li>
         </ul>
+
+        <div *ngIf="overview.knowledge_quality_socre.recommendations?.length">
+            <strong>Recommandations :</strong>
+            <ul>
+                <li *ngFor="let rec of overview.knowledge_quality_socre.recommendations">{{ rec }}</li>
+            </ul>
+        </div>
     </div>
 </mat-card>
 

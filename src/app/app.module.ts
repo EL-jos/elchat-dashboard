@@ -61,6 +61,7 @@ import { MessageService } from 'primeng/api';
 import { SiteProductsComponent } from './pages/site/site-products/site-products.component';
 import { MatSortModule } from '@angular/material/sort';
 import { ProductBottomSheetComponent } from './bottom-sheet/product-bottom-sheet/product-bottom-sheet.component';
+import { PageImportBottomSheetComponent } from './bottom-sheet/page-import-bottom-sheet/page-import-bottom-sheet.component';
 
 
 registerLocaleData(localeFr, 'fr');
@@ -85,7 +86,8 @@ registerLocaleData(localeFr, 'fr');
     SiteConversationsComponent,
     SiteUsersComponent,
     SiteProductsComponent,
-    ProductBottomSheetComponent
+    ProductBottomSheetComponent,
+    PageImportBottomSheetComponent
   ],
   imports: [
     BrowserModule,

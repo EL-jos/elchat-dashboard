@@ -23,10 +23,11 @@ export class PageService {
     return this.http.patch(`${this.api}/pages/${pageId}`, payload);
   }
 
-  deletePage(pageId: string) {
-    return this.http.delete(`${this.api}/pages/${pageId}`);
+  deletePages(pageIds: string[]) {
+    return this.http.request('delete', `${this.api}/pages`, {
+      body: { ids: pageIds }
+    });
   }
-
 
   getPages(siteId: string): Observable<{
     site: any;
@@ -50,5 +51,17 @@ export class PageService {
     return this.http.patch(`${this.api}/pages/${pageId}`, {
       is_indexed: indexed
     });
+  }
+
+  importPages(siteId: string, payload: any) {
+
+    const formData = new FormData();
+    formData.append('file', payload.file);
+    formData.append('mapping', JSON.stringify(payload.mapping));
+
+    return this.http.post(
+      `${this.api}/site/${siteId}/pages/import`,
+      formData
+    );
   }
 }

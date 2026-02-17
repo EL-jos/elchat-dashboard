@@ -1,0 +1,109 @@
+<mat-horizontal-stepper linear>
+
+    <!-- ================= STEP 1 ================= -->
+    <mat-step [stepControl]="fileForm" label="Fichier">
+
+        <form [formGroup]="fileForm">
+
+            <input type="file" accept=".csv,.xlsx,.xls" (change)="onFileSelected($event)" />
+
+            <div class="actions">
+                <button mat-raised-button color="primary" matStepperNext [disabled]="!file">
+                    Suivant
+                </button>
+            </div>
+
+        </form>
+
+    </mat-step>
+
+
+    <!-- ================= STEP 2 ================= -->
+    <mat-step [stepControl]="mappingForm" label="Mapping">
+
+        <form [formGroup]="mappingForm">
+
+            <!-- 🔥 Affichage par groupe -->
+            <div *ngFor="let group of standardColumnGroups" class="group">
+
+                <h3>{{ group.label }}</h3>
+
+                <div class="group-grid">
+
+                    <div *ngFor="let col of group.columns">
+
+                        <mat-form-field appearance="outline" class="full-width">
+
+                            <mat-label>
+                                {{ col.label }}
+                                <span *ngIf="col.required" class="required">*</span>
+                            </mat-label>
+
+                            <mat-select [formControlName]="col.key">
+
+                                <mat-option value="">-- Non mappé --</mat-option>
+
+                                <mat-option *ngFor="let header of headers" [value]="header"
+                                    [disabled]="isOptionDisabled(header, col.key)">
+                                    {{ header }}
+                                </mat-option>
+
+                            </mat-select>
+
+                            <mat-error *ngIf="mappingForm.get(col.key)?.hasError('required')">
+                                Champ requis
+                            </mat-error>
+
+                        </mat-form-field>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="actions">
+
+                <button mat-raised-button matStepperPrevious>
+                    Retour
+                </button>
+
+                <button mat-raised-button color="primary" (click)="submitImport()" [disabled]="mappingForm.invalid">
+                    Importer
+                </button>
+
+            </div>
+
+        </form>
+
+    </mat-step>
+
+</mat-horizontal-stepper>
+
+
+<!-- ================= PREVIEW ================= -->
+
+<div *ngIf="previewData.length" class="preview">
+
+    <h3>🔥 Preview des 5 premières lignes</h3>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th *ngFor="let h of headers">{{ h }}</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let row of previewData">
+                <td *ngFor="let h of headers">
+                    {{ row[h] }}
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+
+</div>

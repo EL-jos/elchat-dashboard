@@ -57,7 +57,38 @@
         <mat-card-title>Listes des sites web</mat-card-title>
         <mat-card-content>
 
+            <div style="display:flex; justify-content:flex-end; margin-bottom:1rem; gap: 1rem;">
+
+                <button mat-raised-button color="warn" (click)="deleteSelected()"
+                    [disabled]="selection.selected.length === 0">
+                    Supprimer la sélection
+                </button>
+
+
+                <button mat-raised-button color="primary" (click)="openImportSheet()">
+                    <mat-icon>upload</mat-icon>
+                    Importer CSV / Excel
+                </button>
+
+            </div>
+
             <table mat-table [dataSource]="dataSource">
+
+                <!-- Checkbox Column -->
+                <ng-container matColumnDef="select">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <mat-checkbox (change)="toggleAllRows()" [checked]="isAllSelected()"
+                            [indeterminate]="selection.hasValue() && !isAllSelected()">
+                        </mat-checkbox>
+                    </th>
+
+                    <td mat-cell *matCellDef="let row">
+                        <mat-checkbox (click)="$event.stopPropagation()" (change)="selection.toggle(row)"
+                            [checked]="selection.isSelected(row)">
+                        </mat-checkbox>
+                    </td>
+                </ng-container>
+
 
                 <!-- Icon Column -->
                 <ng-container matColumnDef="icon">
@@ -73,14 +104,17 @@
                 <!-- Name Column -->
                 <ng-container matColumnDef="title">
                     <th mat-header-cell *matHeaderCellDef> Title </th>
-                    <td mat-cell *matCellDef="let element"> <p style="margin: 0;" [title]="element.title">{{element.title | truncate:40}}</p> </td>
+                    <td mat-cell *matCellDef="let element">
+                        <p style="margin: 0;" [title]="element.title">{{element.title | truncate:40}}</p>
+                    </td>
                 </ng-container>
 
                 <!-- URL Column -->
                 <ng-container matColumnDef="url">
                     <th mat-header-cell *matHeaderCellDef> URL </th>
-                    <td mat-cell *matCellDef="let element"> 
-                        <a [href]="element.url" [title]="element.url" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: .5rem;">
+                    <td mat-cell *matCellDef="let element">
+                        <a [href]="element.url" [title]="element.url" target="_blank" rel="noopener noreferrer"
+                            style="display: flex; align-items: center; gap: .5rem;">
                             {{element.url | truncate:40}}
                             <fa-icon [icon]="icons.externalLink"></fa-icon>
                         </a>
@@ -146,7 +180,7 @@
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
             </table>
-            <mat-paginator [pageSizeOptions]="[10, 20, 50]" showFirstLastButtons
+            <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons
                 aria-label="Select page of periodic elements">
             </mat-paginator>
         </mat-card-content>
