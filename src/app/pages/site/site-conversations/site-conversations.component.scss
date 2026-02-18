@@ -1,0 +1,114 @@
+.conversation-detail-container {
+    padding: 1rem;
+    position: relative;
+
+    .header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+
+        h2 {
+            flex-grow: 1;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .conversation-date {
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+    }
+
+    .messages-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        max-height: 60vh;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+
+        .message {
+            display: flex;
+
+            &.user-msg {
+                justify-content: flex-end;
+
+                .bubble {
+                    background-color: #1976d2;
+                    color: #fff;
+                    border-radius: 15px 15px 0 15px;
+                    max-width: 60%;
+                    padding: 0.5rem 1rem;
+                    position: relative;
+                }
+            }
+
+            &.bot-msg {
+                justify-content: flex-start;
+
+                .bubble {
+                    background-color: #e0e0e0;
+                    color: #000;
+                    border-radius: 15px 15px 15px 0;
+                    max-width: 60%;
+                    padding: 0.5rem 1rem;
+                    position: relative;
+                }
+            }
+
+            .msg-time {
+                display: block;
+                font-size: 0.7rem;
+                opacity: 0.6;
+                margin-top: 0.2rem;
+            }
+        }
+    }
+
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #888;
+    }
+
+    .analyze-btn {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        z-index: 100;
+    }
+
+    .delete-btn {
+        margin-top: 1rem;
+        display: block;
+    }
+}
+
+
+.bubble-content {
+    line-height: 1.5;
+
+    p {
+        margin: 0 0 0.5rem 0;
+    }
+
+    ul {
+        margin: 0.5rem 0;
+        padding-left: 1.2rem;
+
+        li {
+            margin-bottom: 0.3rem;
+        }
+    }
+
+    strong {
+        font-weight: 600;
+    }
+
+    em {
+        font-style: italic;
+    }
+}

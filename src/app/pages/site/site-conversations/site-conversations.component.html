@@ -1,1 +1,44 @@
-<p>site-conversations works!</p>
+<div class="conversation-detail-container">
+
+    <div class="header">
+        <button mat-icon-button (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h2>Conversation avec {{ userName }}</h2>
+        <span class="conversation-date">{{ conversation.created_at | date:'short' }}</span>
+    </div>
+
+    <div class="messages-container" *ngIf="!loading; else loadingTpl">
+        <div *ngFor="let msg of conversation.messages" [ngClass]="{'user-msg': msg.role==='user', 'bot-msg': msg.role==='bot'}"
+            class="message">
+        
+            <div class="bubble">
+        
+                <div class="bubble-content">
+                    <markdown [data]="formatMessage(msg.content)"></markdown>
+                </div>
+        
+                <span class="msg-time">
+                    {{ msg.created_at | date:'shortTime' }}
+                </span>
+        
+            </div>
+        
+        </div>
+    </div>
+
+    <ng-template #loadingTpl>
+        <div class="loading">Chargement messages...</div>
+    </ng-template>
+
+    <!-- Floating Action Button IA -->
+    <button mat-fab color="primary" class="analyze-btn" (click)="analyzeConversation()">
+        <mat-icon>insights</mat-icon>
+    </button>
+
+    <!-- Delete conversation button -->
+    <button mat-stroked-button color="warn" class="delete-btn" (click)="deleteConversation()">
+        <mat-icon>delete</mat-icon> Supprimer la conversation
+    </button>
+
+</div>

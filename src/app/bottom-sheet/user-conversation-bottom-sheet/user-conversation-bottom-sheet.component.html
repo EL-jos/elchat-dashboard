@@ -1,0 +1,62 @@
+<div class="sheet-container">
+
+    <!-- HEADER: User + Stats + Score -->
+    <div class="sheet-header">
+        <h2>Conversations de {{ data.userName }}</h2>
+
+        <div class="user-stats">
+            <span>Score:
+                <strong [ngClass]="getScoreClass(userScore)">{{ userScore }}</strong>
+            </span>
+            <span>Conversations: {{ conversations.length }}</span>
+            <span>Messages: {{ totalMessages }}</span>
+            <span>Dernière activité: {{ lastActivity | date:'short' }}</span>
+        </div>
+
+        <!-- FILTERS -->
+        <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Trier par</mat-label>
+            <mat-select [(value)]="filterOption" (selectionChange)="applyFilter()">
+                <mat-option value="latest">Dernières</mat-option>
+                <mat-option value="mostMessages">Plus actives</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading">Chargement...</div>
+
+    <!-- GRID -->
+    <div class="grid" *ngIf="!loading && conversations.length > 0">
+
+        <mat-card *ngFor="let convo of filteredConversations" class="conversation-card">
+
+            <div class="card-header">
+                <span>{{ convo.created_at | date:'short' }}</span>
+                <span>{{ convo.messages_count }} messages</span>
+            </div>
+
+            <p class="preview">
+                {{ convo.last_message?.content | slice:0:120 }}...
+            </p>
+
+            <div class="actions">
+                <button mat-stroked-button color="primary" (click)="viewFullConversation(convo.id)">
+                    Voir détail complet
+                </button>
+            </div>
+
+            <button mat-fab color="warn" class="delete-btn" (click)="deleteConversation(convo.id)">
+                <mat-icon>delete</mat-icon>
+            </button>
+
+        </mat-card>
+
+    </div>
+
+    <div *ngIf="!loading && conversations.length === 0">
+        Aucune conversation trouvée.
+    </div>
+
+</div>

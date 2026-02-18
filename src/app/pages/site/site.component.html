@@ -18,12 +18,12 @@
   </mat-tab>
 
   <mat-tab label="Users">
-    <app-site-users></app-site-users>
+    <app-site-users [siteId]="siteId"></app-site-users>
   </mat-tab>
 
-  <mat-tab label="Conversations">
+  <!-- <mat-tab label="Conversations">
     <app-site-conversations></app-site-conversations>
-  </mat-tab>
+  </mat-tab> -->
 
   <mat-tab label="Settings">
     <app-site-settings [settings]="overview.settings" [site]="overview.site"></app-site-settings>

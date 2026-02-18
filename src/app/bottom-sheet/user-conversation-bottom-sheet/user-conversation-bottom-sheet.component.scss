@@ -1,0 +1,73 @@
+.sheet-container {
+    padding: 20px;
+}
+
+.grid {
+    display: grid;
+    /* grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); */
+    grid-template-columns: repeat(3, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.conversation-card {
+    position: relative;
+    padding-bottom: 60px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    opacity: 0.7;
+}
+
+.preview {
+    margin-top: 10px;
+    min-height: 60px;
+}
+
+.actions {
+    margin-top: 15px;
+}
+
+.delete-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.mat-mdc-card.mdc-card.conversation-card.ng-star-inserted {
+    padding: 1rem;
+}
+
+.sheet-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.user-stats {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.score-hot {
+    color: #d32f2f;
+    font-weight: bold;
+}
+
+.score-warm {
+    color: #fbc02d;
+    font-weight: bold;
+}
+
+.score-cold {
+    color: #1976d2;
+    font-weight: bold;
+}
+
+.filter-field {
+    width: 200px;
+}

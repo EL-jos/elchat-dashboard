@@ -13,7 +13,7 @@ import { MercureService } from '../mercure/mercure.service';
 })
 export class ConversationService {
 
-  private api = `${environment.serveur.url}/v1`;
+  private api = `${environment.serveur.url}`;
 
   constructor(
     private http: HttpClient,
@@ -30,8 +30,8 @@ export class ConversationService {
     );
   }
 
-  getConversation(id: string): Observable<Conversation> {
-    return this.http.get<any>(`${this.api}/conversation/${id}`).pipe(
+  getConversation(siteId: string, conversation_id: string): Observable<Conversation> {
+    return this.http.get<any>(`${this.api}/conversation/${conversation_id}/${siteId}/admin`).pipe(
       map(c => Conversation.fromJson(c))
     );
   }
@@ -82,5 +82,13 @@ export class ConversationService {
     return this.http.get<any[]>(`${this.api}/users/${userId}/conversations`).pipe(
       map(res => res.map(c => Conversation.fromJson(c)))
     );
+  }
+
+  getUserConversations(siteId: any, userId: any): Observable<Conversation[]> {
+    return this.http.get<any[]>(`${this.api}/site/${siteId}/users/${userId}/conversations`);
+  }
+
+  deleteConversation(id: string) {
+    return this.http.delete(`${this.api}/conversation/${id}`);
   }
 }

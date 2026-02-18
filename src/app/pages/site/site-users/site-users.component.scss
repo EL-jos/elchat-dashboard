@@ -1,0 +1,41 @@
+.users-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 1rem;
+}
+
+.summary-card {
+    padding: 20px;
+    display: flex;
+    justify-content: space-around;
+    font-weight: bold;
+}
+
+.search-field {
+    width: 300px;
+    margin-bottom: 15px;
+}
+
+table {
+    width: 100%;
+    cursor: pointer;
+}
+
+.verified {
+    color: green;
+    font-weight: 600;
+}
+
+.unverified {
+    color: red;
+    font-weight: 600;
+}
+
+.details-card {
+    padding: 20px;
+}
+
+.mat-mdc-card.mdc-card.el-card-table{
+    padding: 1rem;
+}

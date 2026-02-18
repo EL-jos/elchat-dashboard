@@ -12,11 +12,13 @@ export class Conversation {
     ) { }
 
     static fromJson(json: any): Conversation {
-        return new Conversation(
+        const conversation =  new Conversation(
             json.id,
             json.site_id,
             json.created_at
         );
+        conversation.messages = json.messages?.map((m: any) => Message.fromJson(m)) || [];
+        return conversation;
     }
 
     async loadMessages(service: ConversationService): Promise<void> {

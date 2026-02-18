@@ -5,6 +5,7 @@ import { Role } from '../role/role';
 import { Site } from '../site/site';
 import { ConversationService } from 'src/app/services/conversation/conversation.service';
 import { SiteService } from 'src/app/services/site/site.service';
+import { UserStats } from './user-stats';
 //import { ConversationService } from '../../services/';
 
 export class User {
@@ -21,7 +22,8 @@ export class User {
         public email: string,
         public is_verified: boolean,
         public created_at: string | null,
-        public role_id?: string
+        public role_id?: string,
+        public stats?: UserStats
     ) { }
 
     static fromJson(json: any): User {
@@ -45,6 +47,10 @@ export class User {
 
         if (Array.isArray(json.sites)) {
             user.sites = json.sites.map((s: any) => Site.fromJson(s));
+        }
+
+        if (json.stats) {
+            user.stats = json.stats;
         }
 
         return user;

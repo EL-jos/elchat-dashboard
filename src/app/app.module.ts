@@ -62,6 +62,8 @@ import { SiteProductsComponent } from './pages/site/site-products/site-products.
 import { MatSortModule } from '@angular/material/sort';
 import { ProductBottomSheetComponent } from './bottom-sheet/product-bottom-sheet/product-bottom-sheet.component';
 import { PageImportBottomSheetComponent } from './bottom-sheet/page-import-bottom-sheet/page-import-bottom-sheet.component';
+import { UserConversationBottomSheetComponent } from './bottom-sheet/user-conversation-bottom-sheet/user-conversation-bottom-sheet.component';
+import { MarkdownModule } from 'ngx-markdown';
 
 
 registerLocaleData(localeFr, 'fr');
@@ -87,7 +89,8 @@ registerLocaleData(localeFr, 'fr');
     SiteUsersComponent,
     SiteProductsComponent,
     ProductBottomSheetComponent,
-    PageImportBottomSheetComponent
+    PageImportBottomSheetComponent,
+    UserConversationBottomSheetComponent
   ],
   imports: [
     BrowserModule,
@@ -126,7 +129,8 @@ registerLocaleData(localeFr, 'fr');
     FileUploadModule,
     MatStepperModule,
     MatSlideToggleModule,
-    MatSortModule
+    MatSortModule,
+    MarkdownModule.forRoot()
   ],
   providers: [
     MatDatepickerModule,
